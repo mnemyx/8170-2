@@ -34,6 +34,7 @@ class Particle {
 		void AddHistory(Vector3d c);	// gets called by SetCenter()...
 		
 	public:
+		void Reset();					// gets called by the constructor. kind of cleans up..
 		Particle();						// defaults...
 		void Draw();					// draws the particle
 		

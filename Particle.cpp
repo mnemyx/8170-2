@@ -18,13 +18,8 @@
 using namespace std;
 
 ///////////////////// PRIVATE FUNCTIONS ///////////////////
-void Particle::Reset() {
-	InUse = false;
-	nhistory = 0;
-}
-
 void Particle::AddHistory(Vector3d c) {	
-	if(nhistory == MAXHISTORY){
+	if(nhistory == MAXHIST){
 		cerr << "Number of entries in particle history exceeds maximum of " << MAXHIST << endl;
 		exit(1);
 	}
@@ -34,6 +29,10 @@ void Particle::AddHistory(Vector3d c) {
 }
 
 //////////////////// PUBLIC FUNCTIONS /////////////////////
+void Particle::Reset() {
+	InUse = false;
+	nhistory = 0;
+}
 
 Particle::Particle(){
 	Reset();
