@@ -19,22 +19,25 @@ else
   endif
 endif
 
-HFILES 	= Matrix.${H} Vector.${H} Utility.${H} Model.${H} State.${H} Entity.${H}
-OFILES 	= Matrix.o Vector.o Utility.o Model.o State.o Entity.o
-PROJECT = ballbox
+HFILES 	= Matrix.${H} Vector.${H} Utility.${H} Model.${H} Particle.${H} Pmanager.${H} Pgenerator.${H}
+OFILES 	= Matrix.o Vector.o Utility.o Model.o Particle.o Pmanager.o Pgenerator.o
+PROJECT = particles
 
 ${PROJECT}:	${PROJECT}.o $(OFILES)
 	${CC} $(CFLAGS) -o ${PROJECT} ${PROJECT}.o $(OFILES) $(LDFLAGS)
 
 ${PROJECT}.o: ${PROJECT}.${C} $(HFILES)
 	${CC} $(CFLAGS) -c ${PROJECT}.${C}
-
-Entity.o: Entity.${C} Entity.${H}
-	${CC} ${CFLAGS} -c ${INCFLAGS} Entity.${C}
 	
-State.o: State.${C} State.${H}
-	${CC} ${CFLAGS} -c ${INCFLAGS} State.${C}
+Pgenerator.o: Pgenerator.${C} Pgenerator.${H}
+	${CC} ${CFLAGS} -c ${INCFLAGS} Pgenerator.${C}
 
+Pmanager.o: Pmanager.${C} Pmanager.${H}
+	${CC} ${CFLAGS} -c ${INCFLAGS} Pmanager.${C}
+
+Particle.o: Particle.${C} Particle.${H}
+	${CC} ${CFLAGS} -c ${INCFLAGS} Particle.${C}
+	
 Model.o: Model.${C} Model.${H}
 	${CC} ${CFLAGS} -c ${INCFLAGS} Model.${C}
 
