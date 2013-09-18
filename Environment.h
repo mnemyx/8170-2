@@ -16,6 +16,12 @@
 class Environment {
 	private:
 		// figure out the forces involved?
+		Vector3d Acceleration;
+		double CoeffofR;
+		double CoeffofF;
+		
+		Vector3d Wind;
+		double Viscosity;
 		
 	public:
 		Environment();

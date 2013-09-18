@@ -13,36 +13,54 @@
 #include "Vector.h"
 #include "Model.h"
 #include "gauss.h"
+#include "time.h"
 
 #define POINT 0
 #define CIRCLE 1
 #define SPHERE 2
+#define LINE 3		// augh...I'm overwhelming myself
 
 class Pgenerator {
 	private:
+		int Type;
 		Model Shape;
+		
 		Vector3d Center;
 		//Vector3d Velocity;		// could be moving...but uh, for now, let's not move it.
-		double Radius;
-		int Type;
 		
-		GeneratedV0;
-		GeneratedC0;
-		GeneratedColor;
-		GeneratedMas;
+		double Radius;
+		
+		// i need a base for the stuff...
+		int Type;
+		double Mean;
+		double StdDev;
+		double BaseMass;
+		double MStdDev;
+		Vector4d BaseColor;
+		double CStdDev;
+		
+		// because I'm too lazy to create a struct? is the overhead going to be that bad?
+		Vector3d GeneratedV0;
+		Vector3d GeneratedC0;
+		Vector4d GeneratedColor;
+		double GeneratedMass;
 		
 	public:
-		Pgenerator(int type = CIRCLE);
+		Pgenerator();
+		
+		// setters
+		void SetBaseAttr(int type, double bs, double sd, double bm, double msd, Vector4d bc, double csd);
 		void SetCenterRadius(Vector3d center, double radius);
 		void SetModel(int orientation = 2);
+		void SetBaseColor(Vector4d newbc);
 
 		// generate random velocity, center, color, mass
-		void GenerateAttr(double vmin, double vmax);
+		void GenerateAttr();
 		
 		// technically getters
 		Vector3d GenV0();
 		Vector3d GenC0();
-		double* GenCol();
+		Vector4d GenCol();
 		double GenMass();
 		
 };

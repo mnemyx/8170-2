@@ -10,8 +10,19 @@
 
 using namespace std;
 
-Pgenerator::Pgenerator(int type) { 
+Pgenerator::Pgenerator() { 
+	srand48(time(0));
+	gauss(1,1,time(0));
+}
+
+void Pgenerator::SetBaseAttr(int type, double bs, double sd, double bm, double msd, Vector4d bc, double csd) {
 	Type = type;
+	Mean = bs;
+	StdDev = sd;
+	BaseMass = bm;
+	MStdDev = msd;
+	BaseColor = bc;
+	CStdDev = csd;
 }
 
 void Pgenerator::SetCenterRadius(Vector3d center, double radius) {
@@ -26,18 +37,30 @@ void Pgenerator::SetModel(int orientation) {
 	}
 }
 
+void Pgenerator::SetBaseColor(Vector4d newbc) { BaseColor = newbc; }
 
-void Pgenerator::GenerateAttr(double vmin, double vmax) {
+
+void Pgenerator::GenerateAttr(double speed, double* color, double mass) {
+	double smallr = drand48() * drand48();
+	Vector3d smallv.set(drand48() * drand48(), drand48() * drand48(), drand48() * drand48());
+	
 	switch(Type) {
 		case POINT:
 			// get random theta and phi
 			double theta = drand48();
 			double phi = drand48();
 			
-			Vector3d 
+			Vector3d unit;
+			
+			unit.set(sin(theta) * cos(phi), sin(theta) * cos(phi), cos(phi));
+			
+			GeneratedC0 = Center + smallr * unit;
+			GeneratedV0 = gauss(Mean, StdDv, 0) * unit + smallv;
 			
 			break;
-		default:
+			
+		// most of my other stuff have triangles...	
+		default:	 
 			// need random triangle index
 			int triIndx = (int) drand48() * (Shape.GetNtriangles() - 1);
 			
@@ -50,7 +73,7 @@ void Pgenerator::GenerateAttr(double vmin, double vmax) {
 			p2 = Shape.GetVertex(vertices.z);
 			
 			// need random u & v under 1
-			double u, v, smallr;
+			double u, v;
 			
 			u = drand48();
 			v = drand48() * (1 - u);
@@ -60,32 +83,21 @@ void Pgenerator::GenerateAttr(double vmin, double vmax) {
 				v = drand48() * (1 - u);
 			}
 			
-			smallr = drand48() * drand48();
-			
 			// calculate new point by turning it back to cartesian coordinates
-			return p2 + u * (p0 - p2) + v * (p1 - p2) + smallr * Shape.GetNormal(triIndx);
+			GeneratedC0 = p2 + u * (p0 - p2) + v * (p1 - p2) + (smallr * Shape.GetNormal(triIndx));
+			GeneratedV0 = gauss(Mean, StdDv, 0) * Shape.GetNormal(triIndx) + smallv;
+			
 			break;
 	}
+	
+	// figure out a random mass and color
+	GeneratedMass = gauss(BaseMass, MStdDev, 0);
+	GeneratedColor.set(gauss(BaseColor.x, CStdDev, 0), gauss(BaseColor.y, CStdDev, 0), gauss(BaseColor.z, CStdDev, 0), gauss(BaseColor.w, CStdDev, 0));
 }
+
 
 // generate random velocity, center, color, mass
-Vector3d Pgenerator::GenV0(double min, double max) {
-	// generate the center & velocity
-	switch(Type) {
-		case POINT:
-			break;
-		default:
-			
-			break;
-	}
-}
-
-Vector3d Pgenerator::GenC0() {
-	// mrand * max;
-	
-	
-}
-
-double* Pgenerator::GenCol() {}
-
-double Pgenerator::GenMass() {}
+Vector3d Pgenerator::GenV0() { return GeneratedV0; }
+Vector3d Pgenerator::GenC0() { return GeneratedC0; }
+Vector4d Pgenerator::GenCol() { return GeneratedColor; }
+double Pgenerator::GenMass() { return GeneratedMass; }
