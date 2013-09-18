@@ -10,7 +10,7 @@
 #ifndef _PARTICLE_H_
 #define _PARTICLE_H_
 
-#define MAXHIST		1000
+#define MAXHIST		10000
 
 #include "Vector.h"
 
@@ -21,18 +21,42 @@ class Particle {
 		Vector3d C0;					// initial position
 		Vector3d Center;				// (current) position
 		
+		Vector3d Acceleration;			// acceleration...
 		int Birth;						// store NTimeSteps of when the particle is "born" (for age)
 		double Color[4];				// color
 		double Mass;					// particle's mass
-		int Status;						// particle off/on
+		int InUse;						// particle off/on
 
-		Vector3d History[MAXHIST];		// particle's history
+		Vector3d History[MAXHIST];		// particle's history of centers
+		int nhistory;					// history indx
+		
+		void Reset();					// gets called by the constructor. kind of cleans up..
+		void AddHistory(Vector3d c);	// gets called by SetCenter()...
 		
 	public:
-		Particle();
+		Particle();						// defaults...
+		void Draw();					// draws the particle
 		
-		// draws the particle
-		Draw();
+		//////////// SETTERS //////////////
+		void SetV0(Vector3d v);
+		void SetVelocity(Vector3d v);
+		void SetC0(Vector3d c);
+		void SetCenter(Vector3d c);
+		void SetAcceleration(Vector3d a);
+		void SetBirth(int timestep);
+		void SetColor(double* color);
+		void SetMass(double m);
+		void SetInUse(int switch);
+
+		//////////// GETTERS ///////////////
+		Vector3d GetV0();
+		Vector3d GetVelocity();
+		Vector3d GetC0();
+		Vector3d GetCenter();
+		Vector3d GetAcceleration();
+		int GetAge(int currentTimestep);
+		int IsInUse();
+		
 };
 
 #endif

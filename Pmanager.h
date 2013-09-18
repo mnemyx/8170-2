@@ -16,7 +16,8 @@
 
 class Pmanager {
 	private:
-		Particle Particles[MAXPART];
+		Particle Particles[MAXPART];	// matrix of particles...
+		int nused;						// count of used particles
 				
 	public:
 		Pmanager();
