@@ -380,6 +380,42 @@ void Model::BuildCone(float radius, float height){
 
 
 //
+// Make a circle
+//
+void Model::BuildCircle(float radius, int orientation, double x, double y, double z) {
+  const int NUMFACETS = 16;
+
+  int v[NUMFACETS+1];
+  Vector3d vector;
+  int i, j;
+  float theta;
+  
+  Clean();
+
+  // construct the vertices for the base of the cone
+  i = 0;
+  for(theta = 0; theta < 360; theta += 360.0 / NUMFACETS){
+	switch (orientation) {
+		case VERTICALX: vector.set(x, radius * cos(DegToRad(theta)) + y, radius * sin(DegToRad(theta)) + z); break;
+		case VERTICALZ: vector.set(radius * cos(DegToRad(theta)) + x, radius * sin(DegToRad(theta)) + y, z); break;
+		case HORIZONTAL: vector.set(radius * cos(DegToRad(theta)) + x, y, radius * sin(DegToRad(theta)) + z); break;
+	}
+    v[i++] = AddVertex(vector);
+  }
+		 
+  // construct the vertex at the center
+  vector.set(x, y, z);
+  v[i++] = AddVertex(vector);
+			 
+  // construct the triangles that make the base
+  for(i = 0; i < NUMFACETS; i++){
+    j = (i + 1) % NUMFACETS;
+    AddTriangle(v[j], v[i], v[NUMFACETS]);
+  }
+}
+
+
+//
 // Draw the current model in wireframe or shaded
 //
 void Model::Draw(int wireframe){
@@ -455,3 +491,13 @@ void Model::Draw(const float* frontC, const float* backC){
     glEnd();
   }
 }
+
+// get triangle @ index & vertex @ index
+Vector3d Model::GetTriangle(int indx) {
+	Vector3d temp.set(triangles[indx][0], triangles[indx][1], triangles[indx][2]);
+	return temp;
+}
+
+Vector3d Model::GetVertex(int indx) { return vertices[indx]; }
+int Model::GetNtriangles() { return ntriangles; }
+Vector3d Model::GetNormal(int indx) { return normals[indx]; }

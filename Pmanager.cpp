@@ -21,9 +21,22 @@ int Pmanager::HasFreeParticles() {
 	else return true;
 }
 
+void Pmanager::UseParticle(Vector3d c0, Vector3d v0, int ts, double* color, double m) {
+	
+	Particles[nused].SetInUse(true);
+	Particles[nused].SetC0(c0);
+	Particles[nused].SetV0(v0);
+    Particles[nused].SetBirth(ts);
+	Particles[nused].SetColor(color);
+	Particles[nused].SetMass(m);
+	
+	nused++;
+}
+
 void Pmanager::FreeParticle(int indx) {
-	if (Particles[indx].IsInUse()) {
-		Particles[indx].Reset();
+	if (Particles[indx].IsInUse() && Particles[nused-1].IsInUse()) {
+		Particles[indx].Particles[nused-1];
+		Particles[nused-1].Reset();
 		nused--;
 	}
 }
@@ -31,7 +44,6 @@ void Pmanager::FreeParticle(int indx) {
 void Pmanager::DrawSystem() {
 	int i;
 	
-	for ( i = 0; i < MAXPART; i++ ) {
-		if (Particles[i].IsInUse()) Particles[i].Draw();
-	}
+	for ( i = 0; i < nused; i++ ) Particles[i].Draw();
 }
+

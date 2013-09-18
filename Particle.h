@@ -30,7 +30,6 @@ class Particle {
 		Vector3d History[MAXHIST];		// particle's history of centers
 		int nhistory;					// history indx
 		
-		void Reset();					// gets called by the constructor. kind of cleans up..
 		void AddHistory(Vector3d c);	// gets called by SetCenter()...
 		
 	public:

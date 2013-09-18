@@ -17,17 +17,22 @@
 class Pmanager {
 	private:
 		Particle Particles[MAXPART];	// matrix of particles...
-		Pgenerator Generator;			// the manager's particle generator?
 		int nused;						// count of used particles
 				
 	public:
 		Pmanager();
-		int HasFreeParticles();			// determines if it has free particles
-		void FreeParticle(int indx);	// frees a used particle @ given index
-		void DrawSystem();
 		
-		int UseParticle();				// returns an int for the generator to use?
+		// determines if it has free particles
+		int HasFreeParticles();					
 		
+		// assigns particle an initial velocity and center...
+		void UseParticle(Vector3d c0, Vector3d v0, int ts, double* color, double m);
+		
+		// frees a used particle @ given index		
+		void FreeParticle(int indx);
+			
+		// draws all the used particles
+		void DrawSystem();						
 };
 
 #endif

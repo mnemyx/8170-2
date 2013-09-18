@@ -20,6 +20,10 @@
 #define SIDES			1
 #define TOPBOTTOM		2
 
+#define VERTICALX 0
+#define VERTICALZ 1
+#define HORIZONTAL 2
+
 class Model{
 protected:
   Vector3d vertices[MAXVERTICES];   // vertex coordinates
@@ -56,11 +60,19 @@ public:
   // Make a cone model
   void BuildCone(float radius = 0.5, float height = 1.0);
   
+  // build the triangles for a circle
+  void BuildCircle(float radius = 1.0, int orientation = 2, double x = 0, double y = 0, double z = 0);
+  
   // draw the current model
   void Draw(int wireframe = 1);
   void Draw(const float* color);
   void Draw(const float* frontC, const float* backC);
   
+  // get triangle @ index & vertex @ index
+  Vector3d GetTriangle(int indx);
+  Vector3d GetVertex(int indx);
+  int GetNtriangles();
+  Vector3d GetNormal(int indx);
 };
 
 #endif
