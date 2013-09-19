@@ -10,7 +10,7 @@
 #ifndef _PMANAGER_H_
 #define _PMANAGER_H_
 
-#define MAXPART		1000
+#define MAXPART		10000
 
 #include "Particle.h"
 
@@ -33,6 +33,8 @@ class Pmanager {
 			
 		// draws all the used particles
 		void DrawSystem();						
+		
+		void CheckCollision(Vector3d normal, Vector3d p0, Vector3d p1, Vector3d p2);
 };
 
 #endif

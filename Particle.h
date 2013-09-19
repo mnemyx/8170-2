@@ -23,7 +23,7 @@ class Particle {
 		
 		Vector3d Acceleration;			// acceleration...
 		int Birth;						// store NTimeSteps of when the particle is "born" (for age)
-		double Color[4];				// color
+		Vector4d Color;					// color
 		double Mass;					// particle's mass
 		int InUse;						// particle off/on
 
@@ -44,7 +44,7 @@ class Particle {
 		void SetCenter(Vector3d c);
 		void SetAcceleration(Vector3d a);
 		void SetBirth(int timestep);
-		void SetColor(double* color);
+		void SetColor(Vector4d color);
 		void SetMass(double m);
 		void SetInUse(int switch);
 

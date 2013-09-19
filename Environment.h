@@ -16,7 +16,7 @@
 class Environment {
 	private:
 		// figure out the forces involved?
-		Vector3d Acceleration;
+		Vector3d G;
 		double CoeffofR;
 		double CoeffofF;
 		
@@ -24,7 +24,7 @@ class Environment {
 		double Viscosity;
 		
 	public:
-		Environment();
+		Environment();		// just pass in an environment specific file?
 		
 		
 };

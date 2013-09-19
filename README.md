@@ -19,7 +19,7 @@ DESCRIPTION
 	Guass/Matrix/Vector/Utility by Dr. House
 	Model Class modified to create an isosphere & plane
 
-	Usage: psystem
+	Usage: particles [param_filename]
 	
 	
 KEY COMMANDS
@@ -52,7 +52,7 @@ MENU COMMANDS
 
 FILES
 ==================================================================
-	psystem.cpp (main program)
+	particles.cpp (main program)
 	Model.cpp, Model.h
 	
 	

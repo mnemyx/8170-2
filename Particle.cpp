@@ -39,7 +39,7 @@ Particle::Particle(){
 }
 
 void Particle::Draw() {
-    glColor4f(Color[0], Color[1], Color[2], Color[3]); 	
+    glColor4f(Color.x, Color.y, Color.z, Color.w); 	
 	
 	glBegin(GL_POINTS);
 		glVertex3f(Center.x, Center.y, Center.z);

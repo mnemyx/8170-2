@@ -21,7 +21,7 @@ int Pmanager::HasFreeParticles() {
 	else return true;
 }
 
-void Pmanager::UseParticle(Vector3d c0, Vector3d v0, int ts, double* color, double m) {
+void Pmanager::UseParticle(Vector3d c0, Vector3d v0, int ts, Vector4d color, double m) {
 	
 	Particles[nused].SetInUse(true);
 	Particles[nused].SetC0(c0);
