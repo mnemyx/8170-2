@@ -16,6 +16,9 @@
 #ifndef _GAUSS_H
 #define _GAUSS_H
 
+#include <cmath>
+#include <stdlib.h>
+
 double gauss(double mean, double std, int seed);
 
 #endif

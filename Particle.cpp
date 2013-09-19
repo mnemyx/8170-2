@@ -56,9 +56,9 @@ void Particle::SetCenter(Vector3d c) {
 }
 void Particle::SetAcceleration(Vector3d a) { Acceleration = a; }
 void Particle::SetBirth(int timestep) { Birth = timestep; }
-void Particle::SetColor(double* c) { Color = c; }
+void Particle::SetColor(Vector4d c) { Color = c; }
 void Particle::SetMass(double m) { Mass = m; }
-void Particle::SetInUse(int switch) { InUse = switch; }
+void Particle::SetInUse(int type) { InUse = type; }
 
 //////////// GETTERS ///////////////
 Vector3d Particle::GetV0() { return V0; }
@@ -66,5 +66,5 @@ Vector3d Particle::GetVelocity() { return Velocity; }
 Vector3d Particle::GetC0() { return C0; }
 Vector3d Particle::GetCenter() { return Center; }
 Vector3d Particle::GetAcceleration() { return Acceleration; }
-int Particle::GetAge(int currentTimestep) { return Timestep - Birth; }
+int Particle::GetAge(int currentTimestep) { return currentTimestep - Birth; }
 int Particle::IsInUse() { return InUse; }

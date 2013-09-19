@@ -494,7 +494,8 @@ void Model::Draw(const float* frontC, const float* backC){
 
 // get triangle @ index & vertex @ index
 Vector3d Model::GetTriangle(int indx) {
-	Vector3d temp.set(triangles[indx][0], triangles[indx][1], triangles[indx][2]);
+	Vector3d temp;
+	temp.set(triangles[indx][0], triangles[indx][1], triangles[indx][2]);
 	return temp;
 }
 

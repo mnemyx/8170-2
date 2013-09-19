@@ -40,40 +40,36 @@ void Pgenerator::SetModel(int orientation) {
 void Pgenerator::SetBaseColor(Vector4d newbc) { BaseColor = newbc; }
 
 
-void Pgenerator::GenerateAttr(double speed, double* color, double mass) {
+void Pgenerator::GenerateAttr() {
 	double smallr = drand48() * drand48();
-	Vector3d smallv.set(drand48() * drand48(), drand48() * drand48(), drand48() * drand48());
+	Vector3d smallv;
+	smallv.set(drand48() * drand48(), drand48() * drand48(), drand48() * drand48());
+	
+	// get random theta and phi
+	double theta = drand48();
+	double phi = drand48();
+	Vector3d unit;
+	
+	// for triangles- need random index, need temp vectors, u & v
+	int triIndx = (int) drand48() * (Shape.GetNtriangles() - 1);
+	Vector3d vertices, p0, p1, p2;
+	double u, v;
 	
 	switch(Type) {
 		case POINT:
-			// get random theta and phi
-			double theta = drand48();
-			double phi = drand48();
-			
-			Vector3d unit;
-			
 			unit.set(sin(theta) * cos(phi), sin(theta) * cos(phi), cos(phi));
 			
 			GeneratedC0 = Center + smallr * unit;
-			GeneratedV0 = gauss(Mean, StdDv, 0) * unit + smallv;
+			GeneratedV0 = gauss(Mean, StdDev, 0) * unit + smallv;
 			
 			break;
 			
 		// most of my other stuff have triangles...	
 		default:	 
-			// need random triangle index
-			int triIndx = (int) drand48() * (Shape.GetNtriangles() - 1);
-			
-			// need the points
-			Vector3d vertices, p0, p1, p2;
-			
 			vertices = Shape.GetTriangle(triIndx);
 			p0 = Shape.GetVertex(vertices.x);
 			p1 = Shape.GetVertex(vertices.y);
 			p2 = Shape.GetVertex(vertices.z);
-			
-			// need random u & v under 1
-			double u, v;
 			
 			u = drand48();
 			v = drand48() * (1 - u);
@@ -85,7 +81,7 @@ void Pgenerator::GenerateAttr(double speed, double* color, double mass) {
 			
 			// calculate new point by turning it back to cartesian coordinates
 			GeneratedC0 = p2 + u * (p0 - p2) + v * (p1 - p2) + (smallr * Shape.GetNormal(triIndx));
-			GeneratedV0 = gauss(Mean, StdDv, 0) * Shape.GetNormal(triIndx) + smallv;
+			GeneratedV0 = gauss(Mean, StdDev, 0) * Shape.GetNormal(triIndx) + smallv;
 			
 			break;
 	}

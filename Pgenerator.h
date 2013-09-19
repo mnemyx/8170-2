@@ -31,7 +31,6 @@ class Pgenerator {
 		double Radius;
 		
 		// i need a base for the stuff...
-		int Type;
 		double Mean;
 		double StdDev;
 		double BaseMass;

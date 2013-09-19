@@ -26,7 +26,7 @@ class Pmanager {
 		int HasFreeParticles();					
 		
 		// assigns particle an initial velocity and center...
-		void UseParticle(Vector3d c0, Vector3d v0, int ts, double* color, double m);
+		void UseParticle(Vector3d c0, Vector3d v0, int ts, Vector4d color, double m);
 		
 		// frees a used particle @ given index		
 		void FreeParticle(int indx);

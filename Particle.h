@@ -46,7 +46,7 @@ class Particle {
 		void SetBirth(int timestep);
 		void SetColor(Vector4d color);
 		void SetMass(double m);
-		void SetInUse(int switch);
+		void SetInUse(int type);
 
 		//////////// GETTERS ///////////////
 		Vector3d GetV0();

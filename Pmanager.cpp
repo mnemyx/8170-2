@@ -35,7 +35,7 @@ void Pmanager::UseParticle(Vector3d c0, Vector3d v0, int ts, Vector4d color, dou
 
 void Pmanager::FreeParticle(int indx) {
 	if (Particles[indx].IsInUse() && Particles[nused-1].IsInUse()) {
-		Particles[indx].Particles[nused-1];
+		Particles[indx] = Particles[nused-1];
 		Particles[nused-1].Reset();
 		nused--;
 	}

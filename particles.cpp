@@ -1,12 +1,12 @@
 /********************************************************
-  particles.cpp
+  Sps.cpp
   
   CPSC8170 - Proj 2   GBG   9/2013
 *********************************************************/
 
-#include "Vector.h"
 #include "Pmanager.h"
 #include "Pgenerator.h"
+#include "Entity.h"
 
 #include <cstdlib>
 #include <cstdio>
@@ -102,7 +102,7 @@ static int NSteps = 0;
 static int NTimeSteps = -1;
 static double Time = 0;
 
-Entity Particle;
+Entity Sp;
 Entity Cube[6];
 
 
@@ -144,12 +144,12 @@ void DrawMovingObj(int collision) {
   
   if(collision) {
 	  GetShading(3);
-	  Particle.UpdateModel();
-	  Particle.Draw(YELLOW);
+	  Sp.UpdateModel();
+	  Sp.Draw(YELLOW);
   } else {
 	  GetShading(2);
-	  Particle.UpdateModel();
-	  Particle.Draw(VIOLET);
+	  Sp.UpdateModel();
+	  Sp.Draw(VIOLET);
   }
 }
 
@@ -215,38 +215,38 @@ void Simulate(){
   double fhit, dt;
   
   // don't do anything if our moving object isn't, well, moving.
-  if(Particle.Stopped()) { 
+  if(Sp.Stopped()) { 
     return;
   }
   
   // set the ball's resting...for all the planes...
   for (i = 0; i < 6; i++) {
-	  Cube[i].RestingOnPlane(Particle.Center(), Particle.Velocity(), Particle.Radius(), TimeStep);
+	  Cube[i].RestingOnPlane(Sp.Center(), Sp.Velocity(), Sp.Radius(), TimeStep);
   }
 
   // get the new acceleration
-  //out << "particle at start accel: "; Particle.Acceleration().print(); out << endl;
-  Particle.Accel();
+  //out << "Sp at start accel: "; Sp.Acceleration().print(); out << endl;
+  Sp.Accel();
 
   // if ball in resting contact, and its acceleration is zero or down in the direction of the plane...
   // then cancel the velocity in the direction of the normal and...uhm...set the ball down on the plane...?
   // Clear resting contact if acceleration is up.
   for (i = 0; i < 6; i++) {
-	  if(Cube[i].Rest() && Cube[i].AccelOnPlane(Particle.Acceleration())) {
-		  Particle.AdjustAVC(Cube[i].PlaneNormal(), Cube[i].PlaneVertex());
+	  if(Cube[i].Rest() && Cube[i].AccelOnPlane(Sp.Acceleration())) {
+		  Sp.AdjustAVC(Cube[i].PlaneNormal(), Cube[i].PlaneVertex());
 	  } 
 	  else Cube[i].Rest(false);
   }
   
   // evil Euler integration to get velocity and position at next timestep
-  newvelocity = Particle.CalcVelocity(TimeStep); 
-  newball = Particle.CalcCenter(TimeStep);
+  newvelocity = Sp.CalcVelocity(TimeStep); 
+  newball = Sp.CalcCenter(TimeStep);
   
   // rewriting the one from below according to house's notes from 9/10
   while(tn > 0) {
 	  ihit = -1;
 	  for (i = 0; i < 6; i++) { 
-		  fhit = Cube[i].PlaneBallColl(Particle.Center(), newvelocity, newball, Particle.Radius());
+		  fhit = Cube[i].PlaneBallColl(Sp.Center(), newvelocity, newball, Sp.Radius());
 		  
 		  if(fhit >= 0 && fhit < 1 && fhit < f) {
 			  f = fhit;
@@ -260,21 +260,21 @@ void Simulate(){
 			  dt = f * tn;
 			  
 			  // compute velocity & position for the ball at collision
-			  newvelocity = Particle.CalcVelocity(tn, dt);
-			  newball = Particle.CalcCenter(tn, dt);
+			  newvelocity = Sp.CalcVelocity(tn, dt);
+			  newball = Sp.CalcCenter(tn, dt);
 			  
 			  // reflect it from the plane -- data during collision
-			  Particle.Velocity(newvelocity);
-			  Particle.ScaleVel(Cube[ihit].PlaneNormal());  // stores this into Particle->Velocity
-			  Particle.Center(newball);
+			  Sp.Velocity(newvelocity);
+			  Sp.ScaleVel(Cube[ihit].PlaneNormal());  // stores this into Sp->Velocity
+			  Sp.Center(newball);
 
 			  DrawScene(1, ihit);  // should do something with this in terms of collision; change draw scene function
 			  
 			  dt = (1 - f) * tn;
 			  // finish the integrating
-			  Particle.Accel();
-			  newvelocity = Particle.CalcVelocity(tn, 1 - (dt * f));
-			  newball = Particle.CalcCenter(tn, 1 - (dt * f));
+			  Sp.Accel();
+			  newvelocity = Sp.CalcVelocity(tn, 1 - (dt * f));
+			  newball = Sp.CalcCenter(tn, 1 - (dt * f));
 			  
 			  tn = tn - (tn * f);
 		  }
@@ -287,8 +287,8 @@ void Simulate(){
   // advance the real timestep and set the velocity and position to their new values
   Time += TimeStep;
   NTimeSteps++;
-  Particle.Velocity(newvelocity);
-  Particle.Center(newball);
+  Sp.Velocity(newvelocity);
+  Sp.Center(newball);
 
   ///////////////////////////////////////////////////////////////////////
 
@@ -298,10 +298,10 @@ void Simulate(){
 
   // set up time for next timestep if in continuous mode
   glutIdleFunc(NULL);
-  if(Particle.Step())
-    Particle.Stopped(true);
+  if(Sp.Step())
+    Sp.Stopped(true);
   else{
-    Particle.Stopped(false);
+    Sp.Stopped(false);
     glutTimerFunc(TimerDelay, TimerCallback, 0);
   }
   
@@ -355,7 +355,7 @@ void LoadParameters(char *filename){
     exit(1);
   }
 
-  Particle.InitState(bvelocity, bcenter, bmass, bradius, coeffr, coefff, beps, viscosity, wind, gravity);
+  Sp.InitState(bvelocity, bcenter, bmass, bradius, coeffr, coefff, beps, viscosity, wind, gravity);
   Cube[0].InitState(plane1, plcen1, peps1);
   Cube[1].InitState(plane2, plcen2, peps2);
   Cube[2].InitState(plane3, plcen3, peps3);
@@ -374,15 +374,15 @@ void RestartBall(){
 
   LoadParameters(ParamFilename); // reload parameters in case changed
   
-  Particle.Start(true);
-  Particle.Stopped(true);
+  Sp.Start(true);
+  Sp.Stopped(true);
   
   NTimeSteps = -1;
   glutIdleFunc(NULL);
   Time = 0;
   
-  Particle.Center(Particle.InitialCenter());
-  Particle.Velocity(Particle.InitialVelocity());
+  Sp.Center(Sp.InitialCenter());
+  Sp.Velocity(Sp.InitialVelocity());
     
   DrawScene(0, 0);
 }
@@ -566,20 +566,20 @@ void handleButton(int button, int state, int x, int y){
     AdjustMouse(x, y);	/* adjust mouse coords to current window size */
 
     if(state == GLUT_UP){
-      if(Particle.Start()){
-        Particle.Start(false);
-        Particle.Stopped(false);
-        Particle.Center(Particle.InitialCenter());
-	    Particle.Velocity(Particle.InitialVelocity());
+      if(Sp.Start()){
+        Sp.Start(false);
+        Sp.Stopped(false);
+        Sp.Center(Sp.InitialCenter());
+	    Sp.Velocity(Sp.InitialVelocity());
         DrawScene(0,0);
         glutIdleFunc(Simulate);   
       }
-      else if(Particle.Stopped()){
-        Particle.Stopped(false);
+      else if(Sp.Stopped()){
+        Sp.Stopped(false);
         glutIdleFunc(Simulate);    
       }
       else{
-        Particle.Stopped(true);
+        Sp.Stopped(true);
         glutIdleFunc(NULL);    
       }
     }
@@ -605,12 +605,12 @@ void HandleMenu(int index){
   switch(index){
 
   case MenuContinuous:
-    if(Particle.Step()){
-      Particle.Step(false);
+    if(Sp.Step()){
+      Sp.Step(false);
       glutChangeToMenuEntry(index, "Step", index);
     }
     else{
-      Particle.Step(true);
+      Sp.Step(true);
       glutChangeToMenuEntry(index, "Continuous", index);
     }  
     break;  

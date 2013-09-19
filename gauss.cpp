@@ -17,6 +17,8 @@
  Your program must #include <cmath>, and link -lm
 */
 
+#include "gauss.h"
+
 double gauss(double mean, double std, int seed)
 {
   const int itblmax = 20;	// length - 1 of table describing F inverse
