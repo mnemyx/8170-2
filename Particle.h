@@ -2,13 +2,19 @@
   Particle.h
 
   Header File for Particle Class
-  
-  Gina Guerrero - Fall 2013 
+
+  Gina Guerrero - Fall 2013
 ********************************************************/
 
 
 #ifndef _PARTICLE_H_
 #define _PARTICLE_H_
+
+#ifdef __APPLE__
+#  include <GLUT/glut.h>
+#else
+#  include <GL/glut.h>
+#endif
 
 #define MAXHIST		10000
 
@@ -20,23 +26,25 @@ class Particle {
 		Vector3d Velocity;				// (current) velocity
 		Vector3d C0;					// initial position
 		Vector3d Center;				// (current) position
-		
+
 		Vector3d Acceleration;			// acceleration...
 		int Birth;						// store NTimeSteps of when the particle is "born" (for age)
 		Vector4d Color;					// color
 		double Mass;					// particle's mass
+		double Coefff;					// coefficient of friction for particle
+		double Coeffr;					// coefficient of restitution for particle
 		int InUse;						// particle off/on
 
 		Vector3d History[MAXHIST];		// particle's history of centers
 		int nhistory;					// history indx
-		
+
 		void AddHistory(Vector3d c);	// gets called by SetCenter()...
-		
+
 	public:
 		void Reset();					// gets called by the constructor. kind of cleans up..
 		Particle();						// defaults...
 		void Draw();					// draws the particle
-		
+
 		//////////// SETTERS //////////////
 		void SetV0(Vector3d v);
 		void SetVelocity(Vector3d v);
@@ -47,6 +55,8 @@ class Particle {
 		void SetColor(Vector4d color);
 		void SetMass(double m);
 		void SetInUse(int type);
+		void SetCoefff(double f);
+		void SetCoeffr(double r);
 
 		//////////// GETTERS ///////////////
 		Vector3d GetV0();
@@ -55,8 +65,11 @@ class Particle {
 		Vector3d GetCenter();
 		Vector3d GetAcceleration();
 		int GetAge(int currentTimestep);
+		double GetMass();
 		int IsInUse();
-		
+		double GetCoefff();
+		double GetCoeffr();
+
 };
 
 #endif

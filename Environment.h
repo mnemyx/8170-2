@@ -17,14 +17,13 @@ class Environment {
 	private:
 		// figure out the forces involved?
 		Vector3d G;
-		double CoeffofR;
-		double CoeffofF;
-		
 		Vector3d Wind;
 		double Viscosity;
 		
 	public:
 		Environment();		// just pass in an environment specific file?
+		
+		
 		
 		
 };

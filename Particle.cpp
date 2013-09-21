@@ -2,28 +2,26 @@
   Particle.cpp
 
   Source File for Particle Class
-  
-  Gina Guerrero - Fall 2013 
+
+  Gina Guerrero - Fall 2013
 ********************************************************/
 
 #include "Particle.h"
 #include <cstdlib>
 
-#ifdef __APPLE__
-#  include <GLUT/glut.h>
-#else
-#  include <GL/glut.h>
-#endif#include "Vector.h"
+
+
+#include "Vector.h"
 
 using namespace std;
 
 ///////////////////// PRIVATE FUNCTIONS ///////////////////
-void Particle::AddHistory(Vector3d c) {	
+void Particle::AddHistory(Vector3d c) {
 	if(nhistory == MAXHIST){
 		cerr << "Number of entries in particle history exceeds maximum of " << MAXHIST << endl;
 		exit(1);
 	}
-  
+
 	History[nhistory] = c;
 	nhistory++;
 }
@@ -39,8 +37,8 @@ Particle::Particle(){
 }
 
 void Particle::Draw() {
-    glColor4f(Color.x, Color.y, Color.z, Color.w); 	
-	
+    glColor4f(Color.x, Color.y, Color.z, Color.w);
+
 	glBegin(GL_POINTS);
 		glVertex3f(Center.x, Center.y, Center.z);
 	glEnd( );
@@ -59,6 +57,8 @@ void Particle::SetBirth(int timestep) { Birth = timestep; }
 void Particle::SetColor(Vector4d c) { Color = c; }
 void Particle::SetMass(double m) { Mass = m; }
 void Particle::SetInUse(int type) { InUse = type; }
+void Particle::SetCoefff(double f) { Coefff = f; }
+void Particle::SetCoeffr(double r) { Coeffr = r; }
 
 //////////// GETTERS ///////////////
 Vector3d Particle::GetV0() { return V0; }
@@ -68,3 +68,6 @@ Vector3d Particle::GetCenter() { return Center; }
 Vector3d Particle::GetAcceleration() { return Acceleration; }
 int Particle::GetAge(int currentTimestep) { return currentTimestep - Birth; }
 int Particle::IsInUse() { return InUse; }
+double Particle::GetMass() { return Mass; }
+double Particle::GetCoefff() { return Coefff; }
+double Particle::GetCoeffr() { return Coeffr; }

@@ -104,6 +104,8 @@ static double Time = 0;
 
 Entity Sp;
 Entity Cube[6];
+Pmanager Manager;
+Pgenerator Generator;
 
 
 /************** DRAWING & SHADING FUNCTIONS ***********************/
@@ -215,32 +217,34 @@ void Simulate(){
   double fhit, dt;
   
   // don't do anything if our moving object isn't, well, moving.
-  if(Sp.Stopped()) { 
+  if(Manager.IsStopped()) { 
     return;
   }
   
+  // ! let's not rest. use this to kill particles.
   // set the ball's resting...for all the planes...
-  for (i = 0; i < 6; i++) {
-	  Cube[i].RestingOnPlane(Sp.Center(), Sp.Velocity(), Sp.Radius(), TimeStep);
-  }
+  //for (i = 0; i < 6; i++) {
+	 // Cube[i].RestingOnPlane(Sp.Center(), Sp.Velocity(), Sp.Radius(), TimeStep);
+  //}
 
   // get the new acceleration
-  //out << "Sp at start accel: "; Sp.Acceleration().print(); out << endl;
-  Sp.Accel();
+  Manager.CalcAccel();
 
   // if ball in resting contact, and its acceleration is zero or down in the direction of the plane...
   // then cancel the velocity in the direction of the normal and...uhm...set the ball down on the plane...?
   // Clear resting contact if acceleration is up.
-  for (i = 0; i < 6; i++) {
-	  if(Cube[i].Rest() && Cube[i].AccelOnPlane(Sp.Acceleration())) {
-		  Sp.AdjustAVC(Cube[i].PlaneNormal(), Cube[i].PlaneVertex());
-	  } 
-	  else Cube[i].Rest(false);
-  }
+  //for (i = 0; i < 6; i++) {
+	 // if(Cube[i].Rest() && Cube[i].AccelOnPlane(Sp.Acceleration())) {
+		 // Sp.AdjustAVC(Cube[i].PlaneNormal(), Cube[i].PlaneVertex());
+	  //} 
+	 // else Cube[i].Rest(false);
+ // }
   
   // evil Euler integration to get velocity and position at next timestep
   newvelocity = Sp.CalcVelocity(TimeStep); 
   newball = Sp.CalcCenter(TimeStep);
+  
+  
   
   // rewriting the one from below according to house's notes from 9/10
   while(tn > 0) {
