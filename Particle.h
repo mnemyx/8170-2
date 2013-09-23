@@ -38,12 +38,16 @@ class Particle {
 		Vector3d History[MAXHIST];		// particle's history of centers
 		int nhistory;					// history indx
 
+		Vector3d tempv;                 // temporary velocity
+		Vector3d tempc;                 // temporary center
+
 		void AddHistory(Vector3d c);	// gets called by SetCenter()...
 
 	public:
 		void Reset();					// gets called by the constructor. kind of cleans up..
 		Particle();						// defaults...
 		void Draw();					// draws the particle
+		void ReflectVel(Vector3d pnormal, Vector3d pvertex);    // reflect the particle given the triangle's normal and vertex index
 
 		//////////// SETTERS //////////////
 		void SetV0(Vector3d v);
@@ -57,6 +61,8 @@ class Particle {
 		void SetInUse(int type);
 		void SetCoefff(double f);
 		void SetCoeffr(double r);
+		void SetTempv(Vector3d v);
+		void SetTempc(Vector3d c);
 
 		//////////// GETTERS ///////////////
 		Vector3d GetV0();
@@ -69,6 +75,8 @@ class Particle {
 		int IsInUse();
 		double GetCoefff();
 		double GetCoeffr();
+		Vector3d GetTempc();
+		Vector3d GetTempv();
 
 };
 

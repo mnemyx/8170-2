@@ -3,9 +3,9 @@
 
   Source File for Geometric Model Class
   Provides for construction of cuboid, cylinder and cone shapes tiled by triangles
-  
+
   BIHE Computer Graphics    Donald H. House     6/22/06
-  Modified - Gina Guerrero - Fall 2013 
+  Modified - Gina Guerrero - Fall 2013
 */
 
 #include "Model.h"
@@ -34,9 +34,9 @@ int Model::AddVertex(const Vector3d &v){
     cerr << "Number of vertices exceeds maximum of " << MAXVERTICES << endl;
     exit(1);
   }
-  
+
   vertices[nvertices] = v;
-  
+
   return nvertices++;
 }
 
@@ -50,9 +50,9 @@ int Model::AddOVertex(const Vector3d &v){
     cerr << "Number of vertices exceeds maximum of " << MAXVERTICES << endl;
     exit(1);
   }
-  
+
   overtices[onvertices] = v;
-  
+
   return onvertices++;
 }
 
@@ -65,19 +65,19 @@ int Model::AddTriangle(int v0, int v1, int v2){
     cerr << "Number of triangles exceeds maximum of " << MAXTRIANGLES << endl;
     exit(1);
   }
-  
+
   triangles[ntriangles][0] = v0;
   triangles[ntriangles][1] = v1;
   triangles[ntriangles][2] = v2;
-  
+
   Vector3d V0(vertices[v0].x, vertices[v0].y, vertices[v0].z);
   Vector3d V1(vertices[v1].x, vertices[v1].y, vertices[v1].z);
   Vector3d V2(vertices[v2].x, vertices[v2].y, vertices[v2].z);
-  
+
   Vector3d V01 = V1 - V0;
   Vector3d V02 = V2 - V0;
   normals[ntriangles] = (V01 % V02).normalize();
-  
+
   return ntriangles++;
 }
 
@@ -89,20 +89,20 @@ int Model::AddTriangle(int v0, int v1, int v2){
 void Model::Subdivide(int triIdx, int d, float r, Vector3d center) {
 
   if (d == 0) { return; }
-  
+
   // I need to find the 3 vertices from the triangle I need...
-  int v0 = triangles[triIdx][0]; 
+  int v0 = triangles[triIdx][0];
   int v1 = triangles[triIdx][1];
   int v2 = triangles[triIdx][2];
   int v01, v12, v20, ov01, ov12, ov20;
   int nt0, nt1, nt2, nt3;
   double l0, l1, l2;
   Vector3d V0, V1, V2;
-  
+
   V0.set(overtices[v0].x, overtices[v0].y, overtices[v0].z);
   V1.set(overtices[v1].x, overtices[v1].y, overtices[v1].z);
   V2.set(overtices[v2].x, overtices[v2].y, overtices[v2].z);
- 
+
   Vector3d V01((V0.x + V1.x)/2.0, (V0.y + V1.y)/2.0, (V0.z + V1.z)/2.0);
   Vector3d V12((V1.x + V2.x)/2.0, (V1.y + V2.y)/2.0, (V1.z + V2.z)/2.0);
   Vector3d V20((V2.x + V0.x)/2.0, (V2.y + V0.y)/2.0, (V2.z + V0.z)/2.0);
@@ -110,7 +110,7 @@ void Model::Subdivide(int triIdx, int d, float r, Vector3d center) {
   ov01 = AddOVertex(V01);
   ov12 = AddOVertex(V12);
   ov20 = AddOVertex(V20);
-  
+
   V01 = V01.normalize();
   V12 = V12.normalize();
   V20 = V20.normalize();
@@ -119,29 +119,29 @@ void Model::Subdivide(int triIdx, int d, float r, Vector3d center) {
   V01 = V01 * r ;
   V12 = V12 * r;
   V20 = V20 * r;
-  
+
   // need to translate accordingly for center...
   V01 = V01 + center;
   V12 = V12 + center;
   V20 = V20 + center;
-  
+
   // need to add the new vertices...? (could totally be uh, optimized by not storing the same points...but my head hurts)
   v01 = AddVertex(V01);
   v12 = AddVertex(V12);
   v20 = AddVertex(V20);
-  
+
   // add triangles....?  4 of them...
   nt0 = AddTriangle(v0, v01, v20);
   nt1 = AddTriangle(v1, v12, v01);
   nt2 = AddTriangle(v2, v20, v12);
   nt3 = AddTriangle(v01, v12, v20);
-  
+
   // recurse....oh god don't break...do I need to do this? sigh..
   Subdivide(nt0, d-1, r, center);
   Subdivide(nt1, d-1, r, center);
   Subdivide(nt2, d-1, r, center);
-  Subdivide(nt3, d-1, r, center);  
-  
+  Subdivide(nt3, d-1, r, center);
+
   return;
 }
 
@@ -157,7 +157,7 @@ Model::Model(){
 // Added 8/2013: GBG for CPSC8170 Proj 1
 //
 void Model::BuildSphere(float r, int depth, double x, double y, double z) {
-  
+
   int i, j;
   int isign, jsign, ksign;
   int tsign = -1;
@@ -165,7 +165,7 @@ void Model::BuildSphere(float r, int depth, double x, double y, double z) {
   Vector3d center(x,y,z);
   int v[12];
   double l;
-  
+
   double t = (1.0 + sqrt(5.0))/2.0;
   int vlist[60] = {0,11,5,   0,5,1,   0,1,7,   0,7,10,   0,10,11,   //sets of vertices
                    1,5,9,   5,11,4,   11,10,2,   10,7,6,   7,1,8,
@@ -173,11 +173,11 @@ void Model::BuildSphere(float r, int depth, double x, double y, double z) {
                    4,9,5,   2,4,11,   6,2,10,   8,6,7,   9,8,1};
 
   // delete any old data that may have been built previously
-  Clean();  		
-  
+  Clean();
+
   j = 0;
   // construct the 12 vertices
-   for (i = 0; i < 3; i++) 
+   for (i = 0; i < 3; i++)
      for(jsign = -1; jsign <= 1; jsign += 2)
        for(isign = -1; isign <= 1; isign += 2) {
           switch(i) {
@@ -185,27 +185,27 @@ void Model::BuildSphere(float r, int depth, double x, double y, double z) {
             case(1): vector.set(0, 1 * isign, -t * jsign); break;
             case(2): vector.set(-t * jsign, 0, 1 * isign); break;
           }
-	  
+
 	  // remember the original points for the isohedron
 	  AddOVertex(vector);
-	  
+
 	  // puts the point in the unit circle & multiplies it to radius
 	  vector = vector.normalize();
 	  vector = vector * r;
-	  
+
 	  // need to consider the center...
 	  vector = vector + center;
-	  
+
 	  v[j++] = AddVertex(vector);
    }
-   
-     
+
+
   // add the 20 triangles for the main faces
   for(i = 0; i < 60; i += 3)
     AddTriangle(v[vlist[i]], v[vlist[i + 1]], v[vlist[i + 2]]);
-    
+
   // refine the faces
-  for(i = 0; i < 20; i++) 
+  for(i = 0; i < 20; i++)
     Subdivide(i, depth, r, center);
 }
 
@@ -224,10 +224,10 @@ void Model::BuildCuboid(float width, float height, float depth, double x, double
 		   1, 7, 5,     1, 3, 7,    // right
 		   0, 1, 4,     1, 5, 4,    // bottom
 		   2, 7, 3,     2, 6, 7};   // top
-		   
+
   // delete any old data that may have been built previously
   Clean();
-  
+
   // construct the 8 vertices for the cubeoid.
   i = 0;
   for(ksign = -1; ksign <= 1; ksign += 2)
@@ -238,7 +238,7 @@ void Model::BuildCuboid(float width, float height, float depth, double x, double
 
 	    v[i++] = AddVertex(vector);
       }
-	
+
   // construct the 12 triangles that make the 6 faces
   for(i = 0; i < 36; i += 3)
     AddTriangle(v[vlist[i]], v[vlist[i + 1]], v[vlist[i + 2]]);
@@ -256,10 +256,10 @@ void Model::BuildPlane(float l, float h, int orientation, double x, double y, do
   int i;
   int isign, jsign;
   int vlist[6] = {0, 2, 1,     1, 2, 3};   // 2 triangles
-  
+
   // delete any old data that may have been built previously
   Clean();
-  
+
   // construct the 8 vertices for the cubeoid.
   i = 0;
 	for(jsign = -1; jsign <= 1; jsign += 2)
@@ -270,24 +270,24 @@ void Model::BuildPlane(float l, float h, int orientation, double x, double y, do
 					vector.set(jsign * l / 2, isign * h / 2, 0);
 				else
 					vector.set(isign * l / 2, jsign * h / 2, 0); break;
-			case(SIDES): 
+			case(SIDES):
 				if( x < 0 )
 					vector.set(0, jsign * l / 2, isign * h / 2);
 				else
 					vector.set(0, isign * l / 2, jsign * h / 2); break;
 			case(TOPBOTTOM):
 				if ( y > 0 )
-					vector.set(jsign * l / 2, 0, isign * h / 2); 
+					vector.set(jsign * l / 2, 0, isign * h / 2);
 				else
 					vector.set(isign * l / 2, 0, jsign * h / 2); break;
 		}
-		
+
 		vector = vector + center;
-		
+
 		// normals are wrong...how to fix it?
 		v[i++] = AddVertex(vector);
 	  }
-	
+
   // construct the 12 triangles that make the 6 faces
   for(i = 0; i < 6; i += 3)
     AddTriangle(v[vlist[i]], v[vlist[i + 1]], v[vlist[i + 2]]);
@@ -304,14 +304,14 @@ void Model::BuildCylinder(float radius, float height){
   int ksign;
   int i, j;
   float theta;
-  
+
   Clean();
 
   // construct the vertices for the 2 bases of the cylinder
   i = 0;
   for(ksign = -1; ksign <= 1; ksign += 2)
     for(theta = 0; theta < 360; theta += 360.0 / NUMFACETS){
-      vector.set(radius * cos(DegToRad(theta)), 
+      vector.set(radius * cos(DegToRad(theta)),
 		 radius * sin(DegToRad(theta)),
 		 ksign * height / 2);
       v[i++] = AddVertex(vector);
@@ -319,16 +319,16 @@ void Model::BuildCylinder(float radius, float height){
   // construct the two vertices at the centers of the bases
   vector.set(0, 0, -height / 2);
   v[i++] = AddVertex(vector);
-  vector.set(0, 0, height / 2);  
+  vector.set(0, 0, height / 2);
   v[i++] = AddVertex(vector);
-			 
+
   // construct the triangles that make the 2 bases
   for(i = 0; i < NUMFACETS; i++){
     j = (i + 1) % NUMFACETS;
     AddTriangle(v[j], v[i], v[2 * NUMFACETS]);
     AddTriangle(v[i + NUMFACETS], v[j + NUMFACETS], v[2 * NUMFACETS + 1]);
   }
-  
+
   // construct the triangles that make the sides
   for(i = 0; i < NUMFACETS; i++){
     j = (i + 1) % NUMFACETS;
@@ -347,30 +347,30 @@ void Model::BuildCone(float radius, float height){
   Vector3d vector;
   int i, j;
   float theta;
-  
+
   Clean();
 
   // construct the vertices for the base of the cone
   i = 0;
   for(theta = 0; theta < 360; theta += 360.0 / NUMFACETS){
-    vector.set(radius * cos(DegToRad(theta)), 
+    vector.set(radius * cos(DegToRad(theta)),
 	       radius * sin(DegToRad(theta)),
 	       -height / 2);
     v[i++] = AddVertex(vector);
   }
-		 
+
   // construct the vertex at the center of the base and at the apex of the cone
   vector.set(0, 0, -height / 2);
   v[i++] = AddVertex(vector);
   vector.set(0, 0, height / 2);
   v[i++] = AddVertex(vector);
-			 
+
   // construct the triangles that make the base
   for(i = 0; i < NUMFACETS; i++){
     j = (i + 1) % NUMFACETS;
     AddTriangle(v[j], v[i], v[NUMFACETS]);
   }
-  
+
   // construct the triangles that make the sides
   for(i = 0; i < NUMFACETS; i++){
     j = (i + 1) % NUMFACETS;
@@ -389,7 +389,7 @@ void Model::BuildCircle(float radius, int orientation, double x, double y, doubl
   Vector3d vector;
   int i, j;
   float theta;
-  
+
   Clean();
 
   // construct the vertices for the base of the cone
@@ -402,11 +402,11 @@ void Model::BuildCircle(float radius, int orientation, double x, double y, doubl
 	}
     v[i++] = AddVertex(vector);
   }
-		 
+
   // construct the vertex at the center
   vector.set(x, y, z);
   v[i++] = AddVertex(vector);
-			 
+
   // construct the triangles that make the base
   for(i = 0; i < NUMFACETS; i++){
     j = (i + 1) % NUMFACETS;
@@ -421,7 +421,7 @@ void Model::BuildCircle(float radius, int orientation, double x, double y, doubl
 void Model::Draw(int wireframe){
   int itri, ivertex;
   int op = (wireframe? GL_LINE_LOOP: GL_POLYGON);
-  
+
   for(itri = 0; itri < ntriangles; itri++){
     glBegin(op);
       if(!wireframe)
@@ -439,13 +439,13 @@ void Model::Draw(int wireframe){
 //
 void Model::Draw(const float* color){
   int itri, ivertex;
-  
-  glColor4f(color[0], color[1], color[2], color[3]); 
+
+  glColor4f(color[0], color[1], color[2], color[3]);
   for(itri = 0; itri < ntriangles; itri++){
     glBegin(GL_TRIANGLES);
-   
+
 	glNormal3f(normals[itri].x, normals[itri].y, normals[itri].z);
-	
+
       for(int i = 0; i < 3; i++){
 		ivertex = triangles[itri][i];
 		glVertex3f(vertices[ivertex].x, vertices[ivertex].y, vertices[ivertex].z);
@@ -459,20 +459,20 @@ void Model::Draw(const float* color){
 //
 void Model::Draw(const float* frontC, const float* backC){
   int itri, ivertex, i;
-  
-  glColor4f(backC[0], backC[1], backC[2], backC[3]); 
+
+  glColor4f(backC[0], backC[1], backC[2], backC[3]);
   //glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   for(itri = 0; itri < ntriangles; itri++){
 
 	glBegin(GL_TRIANGLES);
-	
+
 	glNormal3f(normals[itri].x, normals[itri].y, normals[itri].z);
-	
+
     for(int i = 0; i < 3; i++){
 	  ivertex = triangles[itri][i];
 	  glVertex3f(vertices[ivertex].x, vertices[ivertex].y, vertices[ivertex].z);
     }
-		
+
     glEnd();
   }
 
@@ -480,25 +480,15 @@ void Model::Draw(const float* frontC, const float* backC){
   //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   for(itri = 0; itri < ntriangles; itri++){
 	glBegin(GL_TRIANGLES);
-	
+
 	glNormal3f(normals[itri].x, normals[itri].y, normals[itri].z);
-		
+
     for(int i = 0; i < 3; i++){
 	  ivertex = triangles[itri][i];
 	  glVertex3f(vertices[ivertex].x, vertices[ivertex].y, vertices[ivertex].z);
     }
-		
+
     glEnd();
   }
 }
 
-// get triangle @ index & vertex @ index
-Vector3d Model::GetTriangle(int indx) {
-	Vector3d temp;
-	temp.set(triangles[indx][0], triangles[indx][1], triangles[indx][2]);
-	return temp;
-}
-
-Vector3d Model::GetVertex(int indx) { return vertices[indx]; }
-int Model::GetNtriangles() { return ntriangles; }
-Vector3d Model::GetNormal(int indx) { return normals[indx]; }

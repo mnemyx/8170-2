@@ -1,6 +1,6 @@
 /********************************************************
   Sps.cpp
-  
+
   CPSC8170 - Proj 2   GBG   9/2013
 *********************************************************/
 
@@ -44,7 +44,7 @@ using namespace std;
 #define DRAWHEIGHT	150		//   height should be in same ratio as window)
 
 #define AMBIENT_FRACTION 0.1	// lighting
-#define DIFFUSE_FRACTION 0.4	
+#define DIFFUSE_FRACTION 0.4
 #define SPECULAR_FRACTION 0.4
 
 
@@ -60,8 +60,8 @@ float hues[][4] = { {1, 1, 1},    // white
 		    {1, 0, 0.5, 0},  // violet
 		    {1, 1, 0},    // yellow
 		  };
-		  
-		  
+
+
 /*** Global variables updated and shared by callback routines ***/
 // Viewing parameters
 static int Projection;
@@ -107,10 +107,16 @@ Entity Cube[6];
 Pmanager Manager;
 Pgenerator Generator;
 
+struct Env {
+    Vector3d G;
+    Vector3d Wind;
+    double  Viscosity;
+} env;
+
 
 /************** DRAWING & SHADING FUNCTIONS ***********************/
-// 
-// Get the shading setup for the objects 
+//
+// Get the shading setup for the objects
 //
 void GetShading(int hueIndx) {
   float ambient_color[4];
@@ -121,14 +127,14 @@ void GetShading(int hueIndx) {
     // set up material colors to current hue.
     for(int i = 0; i < 3; i++)
       ambient_color[i] = diffuse_color[i] = specular_color[i] = 0;
-	  
+
 	for(int i = 0; i < 3; i++) {
 		ambient_color[i] = AMBIENT_FRACTION * hues[hueIndx][i];
 		diffuse_color[i] = DIFFUSE_FRACTION * hues[hueIndx][i];
 		specular_color[i] = SPECULAR_FRACTION * hues[0][i];
 		shininess = 60;
 	}
-    
+
     glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_color);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_color);
     glMaterialfv(GL_FRONT, GL_SPECULAR, specular_color);
@@ -141,9 +147,9 @@ void GetShading(int hueIndx) {
 void DrawMovingObj(int collision) {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
-  glEnable(GL_BLEND); 
+  glEnable(GL_BLEND);
   glDepthMask(GL_TRUE);
-  
+
   if(collision) {
 	  GetShading(3);
 	  Sp.UpdateModel();
@@ -162,32 +168,32 @@ void DrawNonMovingObj() {
   int i;
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
-  glEnable(GL_BLEND); 
+  glEnable(GL_BLEND);
   glDepthMask(GL_TRUE);
-  
+
   GetShading(1);
   for ( i = 0; i < 6; i++ ) {
 	  Cube[i].Draw(BRIGHT_PALEBLUE);
   }
-  
+
 }
 
 //
 //  Draw the ball, its traces and the floor if needed
 //
 void DrawScene(int collision, int cubeIndx){
-  
+
   int i,j;
   Model p;
 
   glClear(GL_COLOR_BUFFER_BIT);
-  glClear(GL_DEPTH_BUFFER_BIT); 
-  
+  glClear(GL_DEPTH_BUFFER_BIT);
+
   DrawNonMovingObj();
-  
+
   if(collision) DrawMovingObj(1);
   else DrawMovingObj(0);
-  
+
   glutSwapBuffers();
 
   if(NSteps < MAXSTEPS){
@@ -208,27 +214,27 @@ void DrawScene(int collision, int cubeIndx){
 //  Run a single time step in the simulation
 //
 void Simulate(){
-  int i;
+  int i, j, p, pindx, objhit;
   Vector3d acceleration;
   Vector3d newvelocity, newball;
   double tn = TimeStep;
   double f = 100;
   int ihit = -1;
   double fhit, dt;
-  
+
   // don't do anything if our moving object isn't, well, moving.
-  if(Manager.IsStopped()) { 
+  if(Manager.IsStopped()) {
     return;
   }
-  
-  // ! let's not rest. use this to kill particles.
+
+  //
   // set the ball's resting...for all the planes...
   //for (i = 0; i < 6; i++) {
 	 // Cube[i].RestingOnPlane(Sp.Center(), Sp.Velocity(), Sp.Radius(), TimeStep);
   //}
 
   // get the new acceleration
-  Manager.CalcAccel();
+  Manager.CalcAccel(env.G, env.Wind, env.Viscosity);
 
   // if ball in resting contact, and its acceleration is zero or down in the direction of the plane...
   // then cancel the velocity in the direction of the normal and...uhm...set the ball down on the plane...?
@@ -236,63 +242,72 @@ void Simulate(){
   //for (i = 0; i < 6; i++) {
 	 // if(Cube[i].Rest() && Cube[i].AccelOnPlane(Sp.Acceleration())) {
 		 // Sp.AdjustAVC(Cube[i].PlaneNormal(), Cube[i].PlaneVertex());
-	  //} 
+	  //}
 	 // else Cube[i].Rest(false);
  // }
-  
-  // evil Euler integration to get velocity and position at next timestep
-  newvelocity = Sp.CalcVelocity(TimeStep); 
-  newball = Sp.CalcCenter(TimeStep);
-  
-  
-  
-  // rewriting the one from below according to house's notes from 9/10
-  while(tn > 0) {
-	  ihit = -1;
-	  for (i = 0; i < 6; i++) { 
-		  fhit = Cube[i].PlaneBallColl(Sp.Center(), newvelocity, newball, Sp.Radius());
-		  
-		  if(fhit >= 0 && fhit < 1 && fhit < f) {
-			  f = fhit;
-			  ihit = i;
-		  }
-	  }
-	  
-	  if(ihit != -1) {
-		  if (!Cube[ihit].Rest()) {
-			  // get the fraction...of the fraction of the time step.
-			  dt = f * tn;
-			  
-			  // compute velocity & position for the ball at collision
-			  newvelocity = Sp.CalcVelocity(tn, dt);
-			  newball = Sp.CalcCenter(tn, dt);
-			  
-			  // reflect it from the plane -- data during collision
-			  Sp.Velocity(newvelocity);
-			  Sp.ScaleVel(Cube[ihit].PlaneNormal());  // stores this into Sp->Velocity
-			  Sp.Center(newball);
 
-			  DrawScene(1, ihit);  // should do something with this in terms of collision; change draw scene function
-			  
-			  dt = (1 - f) * tn;
-			  // finish the integrating
-			  Sp.Accel();
-			  newvelocity = Sp.CalcVelocity(tn, 1 - (dt * f));
-			  newball = Sp.CalcCenter(tn, 1 - (dt * f));
-			  
-			  tn = tn - (tn * f);
-		  }
-		  
-	  } else {
-		  tn = -1;
-	  }
+  // evil Euler integration to get velocity and position at next timestep
+  Manager.CalcTempCV(TimeStep);
+
+
+  // rewriting the one from below according to house's notes from 9/10
+  for (j = 0; j < Manager.GetNused(); j++ ) {
+    tn = TimeStep;
+
+    while(tn > 0) {
+      for (i = 0; i < 6; i++) {
+        objhit = -1;
+        fhit = 100;
+        phit = -1;
+
+        p = Cube[i].CheckCollision(Sp.Center(), newvelocity, newball, &fhit);
+
+        if(fhit >= 0 && fhit < 1 && fhit < f) {
+          f = fhit;
+          objhit = i;
+          pindx = p;
+        }
+      }
+
+      if(objhit != -1 && phit != -1) {
+        //if (!Cube[objhit].Rest()) {
+          // get the fraction...of the fraction of the time step.
+          dt = f * tn;
+
+          // compute velocity & position for the ball at collision
+          Manager.CalcTempCV(tn, dt);
+
+          // reflect it from the plane -- data during collision
+          Manager.Particles[j].SetVelocity(Manager.Particles[j].GetTempv());
+          Manager.Particles[j].ReflectVel(Cube[objhit].GetNormal(pindx), Cube[objhit].GetVertex(Cube[objhit].GetTriangle(pindx).x));
+
+
+          Sp.Velocity(newvelocity);
+          Sp.ScaleVel(Cube[ihit].PlaneNormal());  // stores this into Sp->Velocity
+          Sp.Center(newball);
+
+          DrawScene(1, ihit);  // should do something with this in terms of collision; change draw scene function
+
+          dt = (1 - f) * tn;
+          // finish the integrating
+          Sp.Accel();
+          newvelocity = Sp.CalcVelocity(tn, 1 - (dt * f));
+          newball = Sp.CalcCenter(tn, 1 - (dt * f));
+
+          tn = tn - (tn * f);
+        //}
+
+      } else {
+        tn = -1;
+      }
+    }
+    Sp.Velocity(newvelocity);
+    Sp.Center(newball);
   }
 
-  // advance the real timestep and set the velocity and position to their new values
+  // advance the real timestep
   Time += TimeStep;
   NTimeSteps++;
-  Sp.Velocity(newvelocity);
-  Sp.Center(newball);
 
   ///////////////////////////////////////////////////////////////////////
 
@@ -308,7 +323,7 @@ void Simulate(){
     Sp.Stopped(false);
     glutTimerFunc(TimerDelay, TimerCallback, 0);
   }
-  
+
 }
 
 //
@@ -323,19 +338,19 @@ void TimerCallback(int){
 //  Load parameter file and reinitialize global parameters
 //
 void LoadParameters(char *filename){
-  
+
   FILE *paramfile;
-  
+
   Vector3d bvelocity;
   Vector3d bcenter;
   double bmass, bradius, coeffr, coefff, beps, viscosity;
   Vector3d wind;
   Vector3d gravity;
-  
+
   Vector3d plane1, plane2, plane3, plane4, plane5, plane6;
   Vector3d plcen1, plcen2, plcen3, plcen4, plcen5, plcen6;
   double peps1, peps2, peps3, peps4, peps5, peps6;
-	
+
   if((paramfile = fopen(filename, "r")) == NULL){
     fprintf(stderr, "error opening parameter file %s\n", filename);
     exit(1);
@@ -344,14 +359,14 @@ void LoadParameters(char *filename){
   ParamFilename = filename;
 
  if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
-	&(bvelocity.x), &(bvelocity.y), &(bvelocity.z), &(bcenter.x), &(bcenter.y), &(bcenter.z), 
+	&(bvelocity.x), &(bvelocity.y), &(bvelocity.z), &(bcenter.x), &(bcenter.y), &(bcenter.z),
 	&bmass, &bradius, &coeffr, &coefff, &beps,
-	&(wind.x), &(wind.y), &(wind.z), &(gravity.x), &(gravity.y), &(gravity.z), &viscosity, 
-	&(plane1.x), &(plane1.y), &(plane1.z), &(plcen1.x), &(plcen1.y), &(plcen1.z), &peps1, 
-	&(plane2.x), &(plane2.y), &(plane2.z), &(plcen2.x), &(plcen2.y), &(plcen2.z), &peps2, 
-	&(plane3.x), &(plane3.y), &(plane3.z), &(plcen3.x), &(plcen3.y), &(plcen3.z), &peps3, 
-	&(plane4.x), &(plane4.y), &(plane4.z), &(plcen4.x), &(plcen4.y), &(plcen4.z), &peps4, 
-	&(plane5.x), &(plane5.y), &(plane5.z), &(plcen5.x), &(plcen5.y), &(plcen5.z), &peps5, 
+	&(wind.x), &(wind.y), &(wind.z), &(gravity.x), &(gravity.y), &(gravity.z), &viscosity,
+	&(plane1.x), &(plane1.y), &(plane1.z), &(plcen1.x), &(plcen1.y), &(plcen1.z), &peps1,
+	&(plane2.x), &(plane2.y), &(plane2.z), &(plcen2.x), &(plcen2.y), &(plcen2.z), &peps2,
+	&(plane3.x), &(plane3.y), &(plane3.z), &(plcen3.x), &(plcen3.y), &(plcen3.z), &peps3,
+	&(plane4.x), &(plane4.y), &(plane4.z), &(plcen4.x), &(plcen4.y), &(plcen4.z), &peps4,
+	&(plane5.x), &(plane5.y), &(plane5.z), &(plcen5.x), &(plcen5.y), &(plcen5.z), &peps5,
 	&(plane6.x), &(plane6.y), &(plane6.z), &(plcen6.x), &(plcen6.y), &(plcen6.z), &peps6,
 	&TimeStep, &DispTime) != 62){
     fprintf(stderr, "error reading parameter file %s\n", filename);
@@ -366,7 +381,7 @@ void LoadParameters(char *filename){
   Cube[3].InitState(plane4, plcen4, peps4);
   Cube[4].InitState(plane5, plcen5, peps5);
   Cube[5].InitState(plane6, plcen6, peps6);
-  
+
   TimeStepsPerDisplay = Max(1, int(DispTime / TimeStep + 0.5));
   TimerDelay = int(0.5 * TimeStep * 1000);
 }
@@ -377,17 +392,17 @@ void LoadParameters(char *filename){
 void RestartBall(){
 
   LoadParameters(ParamFilename); // reload parameters in case changed
-  
+
   Sp.Start(true);
   Sp.Stopped(true);
-  
+
   NTimeSteps = -1;
   glutIdleFunc(NULL);
   Time = 0;
-  
+
   Sp.Center(Sp.InitialCenter());
   Sp.Velocity(Sp.InitialVelocity());
-    
+
   DrawScene(0, 0);
 }
 
@@ -402,7 +417,7 @@ void InitSimulation(int argc, char* argv[]){
     fprintf(stderr, "usage: ballbox paramfile\n");
     exit(1);
   }
-  
+
   LoadParameters(argv[1]);
 
   NSteps = 0;
@@ -415,17 +430,17 @@ void InitSimulation(int argc, char* argv[]){
 //
 void InitCamera() {
   Projection = PERSPECTIVE;
-  
+
   glEnable(GL_LIGHTING);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
-  
+
   MenuAttached = false;
-  
+
   Pan = 0;
   Tilt = 0;
   Approach = DEPTH;
-  
+
   ThetaX = 0;
   ThetaY = 0;
 }
@@ -437,20 +452,20 @@ void InitCamera() {
 void drawDisplay(){
   // distant light source, parallel rays coming from front upper right
   const float light_position1[] = {0, -.5, 1, 0};
-  
+
   // clear the window to the background color
   glClear(GL_COLOR_BUFFER_BIT);
   glClear(GL_DEPTH_BUFFER_BIT);  // solid - clear depth buffer
-  // establish shading model, flat or smooth 
+  // establish shading model, flat or smooth
   glShadeModel(GL_SMOOTH);
-    
+
   // light is positioned in camera space so it does not move with object
   glLoadIdentity();
   glLightfv(GL_LIGHT0, GL_POSITION, light_position1);
   glLightfv(GL_LIGHT0, GL_AMBIENT, WHITE);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, WHITE);
   glLightfv(GL_LIGHT0, GL_SPECULAR, WHITE);
-  
+
   glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);
 
@@ -458,13 +473,13 @@ void drawDisplay(){
   glRotatef(Tilt, 1, 0, 0);	    // tilt - rotate camera about x axis
   glRotatef(Pan, 0, 1, 0);	    // pan - rotate camera about y axis
   glTranslatef(0, 0, Approach);     // approach - translate camera along z axis
-  
+
   // rotate the model
   glRotatef(ThetaY, 0, 1, 0);       // rotate model about x axis
-  glRotatef(ThetaX, 1, 0, 0);       // rotate model about y axis  
-    
+  glRotatef(ThetaX, 1, 0, 0);       // rotate model about y axis
+
   DrawScene(0, 0);
-  
+
   glutSwapBuffers();
 }
 
@@ -472,11 +487,11 @@ void drawDisplay(){
 // Set up the projection matrix to be either orthographic or perspective
 //
 void updateProjection(){
-  
+
   // initialize the projection matrix
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  
+
   // determine the projection system and drawing coordinates
   if(Projection == ORTHO)
     glOrtho(-DRAWWIDTH/2, DRAWWIDTH/2, -DRAWHEIGHT/2, DRAWHEIGHT/2, NEAR, FAR);
@@ -488,7 +503,7 @@ void updateProjection(){
     double ymax = scale * DRAWHEIGHT / 2;
     glFrustum(-xmax, xmax, -ymax, ymax, NEAR, FAR);
   }
-  
+
   // restore modelview matrix as the one being updated
   glMatrixMode(GL_MODELVIEW);
 }
@@ -499,11 +514,11 @@ void updateProjection(){
 //  to the original window proportions and to keep the window coordinates fixed
 //
 void doReshape(int w, int h){
-  
+
   glViewport(0, 0, w, h);
   WinWidth = w;
   WinHeight = h;
-  
+
   updateProjection();
 }
 
@@ -521,16 +536,16 @@ void AdjustMouse(int& x, int& y){
 }
 
 //
-//  Watch mouse motion 
+//  Watch mouse motion
 //
 void handleMotion(int x, int y){
   if(!MenuAttached) {
     int delta;
-  
+
     y = -y;
     int dy = y - MouseY;
     int dx = x - MouseX;
-  
+
     switch(Button){
       case GLUT_LEFT_BUTTON:
         ThetaX -= ROTFACTOR * dy;
@@ -548,7 +563,7 @@ void handleMotion(int x, int y){
         glutPostRedisplay();
         break;
     }
-  
+
     MouseX = x;
     MouseY = y;
   }
@@ -558,9 +573,9 @@ void handleMotion(int x, int y){
 //  Watch mouse button presses and handle them
 //
 void handleButton(int button, int state, int x, int y){
-  
+
   if(MenuAttached) {
-  
+
     if(button == GLUT_MIDDLE_BUTTON)
       MiddleButton = (state == GLUT_DOWN);
 
@@ -576,28 +591,28 @@ void handleButton(int button, int state, int x, int y){
         Sp.Center(Sp.InitialCenter());
 	    Sp.Velocity(Sp.InitialVelocity());
         DrawScene(0,0);
-        glutIdleFunc(Simulate);   
+        glutIdleFunc(Simulate);
       }
       else if(Sp.Stopped()){
         Sp.Stopped(false);
-        glutIdleFunc(Simulate);    
+        glutIdleFunc(Simulate);
       }
       else{
         Sp.Stopped(true);
-        glutIdleFunc(NULL);    
+        glutIdleFunc(NULL);
       }
     }
   } else {
-  
+
     if(state == GLUT_UP)
       Button = NONE;		// no button pressed
     else{
       MouseY = -y;			// invert y window coordinate to correspond with OpenGL
       MouseX = x;
-    
+
       Button = button;		// store which button pressed
     }
-    
+
   }
 }
 
@@ -605,7 +620,7 @@ void handleButton(int button, int state, int x, int y){
 //  Menu callback
 //
 void HandleMenu(int index){
-	
+
   switch(index){
 
   case MenuContinuous:
@@ -616,8 +631,8 @@ void HandleMenu(int index){
     else{
       Sp.Step(true);
       glutChangeToMenuEntry(index, "Continuous", index);
-    }  
-    break;  
+    }
+    break;
 
   case MenuReset:
     RestartBall();
@@ -653,13 +668,13 @@ void MakeMenu(){
 // Keypress handling
 //
 void handleKey(unsigned char key, int x, int y){
-  
+
   switch(key){
     case 'q':		// q - quit
     case 'Q':
     case 27:		// esc - quit
       exit(0);
-	  
+
     case 'p':			// P -- toggle between ortho and perspective
     case 'P':
       Projection = !Projection;
@@ -676,7 +691,7 @@ void handleKey(unsigned char key, int x, int y){
     default:		// not a valid key -- just ignore it
       return;
   }
-  
+
   glutPostRedisplay();
 }
 
@@ -686,7 +701,7 @@ void handleKey(unsigned char key, int x, int y){
 // Main program to set up display
 //
 int main(int argc, char* argv[]){
-  
+
   glutInit(&argc, argv);
 
   InitSimulation(argc, argv);
@@ -706,7 +721,7 @@ int main(int argc, char* argv[]){
 
   /* Set up to clear screen to black */
   glClearColor(BG[0], BG[1], BG[2], 0);
-  
+
 
   glutMainLoop();
   return 0;

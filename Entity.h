@@ -1,8 +1,8 @@
 /***************************************************
   Entity.h
-  
+
   Header file for Entity Class
-  
+
   CPSC8170 - Proj 1   GBG   8/2013
 ****************************************************/
 
@@ -15,15 +15,15 @@
 #define MAXSTEPS	10000
 #define SPDEPTH		3
 
-  
+
 class Entity : public Model {		// entity is a model that has a state...
   private:
     State EntState;		// the entity's associated state variables
-	
+
   public:
     // Constructor
     Entity();
-    
+
 	// Setters
 	void Rest(int type);
 	void Stopped(int type);
@@ -31,10 +31,10 @@ class Entity : public Model {		// entity is a model that has a state...
 	void Step(int type);
 	void Trace(int type);
 	void Velocity(Vector3d newv);
-	void Center(Vector3d newc);	
+	void Center(Vector3d newc);
 	void InitState(Vector3d vel, Vector3d cen, double mass, double radius, double coeffr, double coefff, float eps, double viscosity, Vector3d wind, Vector3d gravity);
 	void InitState(Vector3d plane, Vector3d cen, float eps);
-	
+
 	// Getters
 	Vector3d InitialCenter();
 	Vector3d InitialVelocity();
@@ -56,13 +56,14 @@ class Entity : public Model {		// entity is a model that has a state...
 	// Functions
 	/* called by nonmoving objects */
 	float PlaneBallColl(Vector3d bCenter, Vector3d bVelocity, Vector3d bNewCenter, float bRadius);
+  int CheckCollision(Vector3d pcen, Vector3d pvel, Vector3d pnewcen, double *fhit);
 	void RestingOnPlane(Vector3d bCenter, Vector3d bVelocity, float bRadius, double timeStep);
 	int AccelOnPlane(Vector3d bAccel);
 	int VelOnPlane(Vector3d bVelocity);
 	int CenOnPlane(float radius);
 	void AddOCenter(int nsteps);
 	void AddOCollision(int collision, int nsteps);
-	
+
 	/* called by moving objects */
 	void UpdateModel();
 	void Accel();
@@ -72,6 +73,12 @@ class Entity : public Model {		// entity is a model that has a state...
 	Vector3d CalcCenter(double timestep, double f);
 	Vector3d CalcCenter(double timestep);
 	void ScaleVel(Vector3d pnormal);
+
+	  // get triangle @ index & vertex @ index
+  Vector3d GetTriangle(int indx);
+  Vector3d GetVertex(int indx);
+  int GetNtriangles();
+  Vector3d GetNormal(int indx);
 };
 
 #endif

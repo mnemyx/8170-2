@@ -44,6 +44,25 @@ void Particle::Draw() {
 	glEnd( );
 }
 
+// reflect velocity off of plane
+void Particle::ReflectVel(Vector3d pnormal, Vector3d pvertex) {
+	Vector3d vn, vt;
+	Vector3d unorm;
+
+	unorm.set(pnormal.normalize());
+
+	if (Velocity * unorm == 0) vn.set(0,0,0);
+	else vn = (Velocity * unorm) * unorm;
+
+	if (Velocity * unorm == 0) vt = Velocity;
+	else vt = Velocity - (Velocity * unorm) * unorm;
+
+	vn = -CoeffofRestitution * vn;
+	vt = (1 - CoeffofFriction) * vt;
+
+	Velocity = vn + vt;
+}
+
 //////////// SETTERS //////////////
 void Particle::SetV0(Vector3d v) { V0 = v; }
 void Particle::SetVelocity(Vector3d v) { Velocity = v; }
@@ -59,6 +78,8 @@ void Particle::SetMass(double m) { Mass = m; }
 void Particle::SetInUse(int type) { InUse = type; }
 void Particle::SetCoefff(double f) { Coefff = f; }
 void Particle::SetCoeffr(double r) { Coeffr = r; }
+void Particle::SetTempv(Vector3d v) { tempv = v; }
+void Particle::SetTempc(Vector3d c) { tempc = c; }
 
 //////////// GETTERS ///////////////
 Vector3d Particle::GetV0() { return V0; }
@@ -71,3 +92,5 @@ int Particle::IsInUse() { return InUse; }
 double Particle::GetMass() { return Mass; }
 double Particle::GetCoefff() { return Coefff; }
 double Particle::GetCoeffr() { return Coeffr; }
+Vector3d Particle::GetTempc() { return tempc; }
+Vector3d Particle::GetTempv() { return tempv; }

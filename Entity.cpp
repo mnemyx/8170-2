@@ -1,8 +1,8 @@
 /***************************************************
   Entity.cpp
-  
+
   Source file for Entity Class
-  
+
   CPSC8170 - Proj 1   GBG   8/2013
 ****************************************************/
 
@@ -16,19 +16,19 @@ using namespace std;
 //
 // Constructor
 //
-Entity::Entity(){	
+Entity::Entity(){
 }
 
 
-// 
+//
 // Setters
 //
 void Entity::Rest(int type) { EntState.SetResting(type); }
 void Entity::Start(int start) { EntState.SetStart(start); }
-void Entity::Stopped(int stop) { EntState.SetStopped(stop); } 
+void Entity::Stopped(int stop) { EntState.SetStopped(stop); }
 void Entity::Step(int step) { EntState.SetStep(step); }
 void Entity::Trace(int trace) { EntState.SetTrace(trace); }
-void Entity::Center(Vector3d newc) { EntState.SetCenter(newc); }	
+void Entity::Center(Vector3d newc) { EntState.SetCenter(newc); }
 void Entity::Velocity(Vector3d newv) { EntState.SetVelocity(newv); }
 void Entity::InitState(Vector3d vel, Vector3d cen, double mass, double radius, double coeffr, double coefff, float eps, double viscosity, Vector3d wind, Vector3d gravity) {
 	BuildSphere(radius, 3, cen.x, cen.y, cen.z);
@@ -50,9 +50,9 @@ void Entity::InitState(Vector3d plane, Vector3d cen, float eps) {
 	EntState.SetCenter(cen);
 	EntState.SetInitialCenter(cen);
 }
-	
-	
-// 
+
+
+//
 // Getters
 //
 Vector3d Entity::InitialCenter() { return EntState.GetInitialCenter(); }
@@ -65,7 +65,7 @@ Vector3d Entity::PlaneNormal() { return EntState.GetCollidedN(); }
 Vector3d Entity::PlaneVertex(int indx) { return vertices[indx]; }
 int Entity::Rest() { return EntState.IsResting(); }
 int Entity::Start() { return EntState.IsStarted(); }
-int Entity::Stopped() { return EntState.IsStopped(); } 
+int Entity::Stopped() { return EntState.IsStopped(); }
 int Entity::Step() { return EntState.IsStep(); }
 int Entity::Trace() { return EntState.IsTrace(); }
 int Entity::GetCollision(int indx) { return EntState.Collided(indx); }	// called by planes
@@ -84,17 +84,17 @@ float Entity::PlaneBallColl(Vector3d bCenter, Vector3d bVelocity, Vector3d bNewC
 	Vector3d bCentMod;
 	Vector3d bNewCentMod;
 	Vector3d avgN;
-	
+
 	for (i = 0; i < ntriangles; i++) {
 		avgN = avgN + normals[i];
 	}
-	
+
 	avgN = avgN / 2;
 	avgN.normalize();
-	
+
 	//planeNorma - Center - plaN * pV
 	p = (bVelocity.normalize() * vertices[1]) - (bVelocity.normalize() * avgN);
-	
+
 	if(p < 0) { //we're behind the plane we're testing
 		bCentMod.set(((bCenter * avgN) + bRadius) * avgN);
 		bNewCentMod.set(((bNewCenter * avgN) + bRadius) * avgN);
@@ -104,14 +104,49 @@ float Entity::PlaneBallColl(Vector3d bCenter, Vector3d bVelocity, Vector3d bNewC
 	}
 
 	f = ((bCenter - vertices[1]) * avgN / ((bCenter - bNewCentMod) * avgN));
-	
+
 	return f;
+}
+
+// fast triangle intersection test
+// should be called by collidable objects
+// uh...returns the index of the triangle that's closeset
+// pass in as &fhit
+int Entity::CheckCollision(Vector3d pcen, Vector3d pvel, Vector3d pnewcen, double *fhit) {
+  int i, rtni;
+  float f;
+  double u, v, a;
+  Vector3d p0, p1, p2;
+
+  rtni = -1;
+
+  for (i = 0; i < ntriangles; i++) {
+    p0.set(vertices[triangles[i][0]]);
+    p1.set(vertices[triangles[i][1]]);
+    p2.set(vertices[triangles[i][2]]);
+
+    a = ((p2 - p1) % (p1 - p0)).norm();
+
+    u = ((p2 - p1) % (pcen - p1)) * normals[i] / a;
+    v = ((p0 - p2) % (pcen - p2)) * normals[i] / a;
+
+    if(u >= 0 && v >= 0 && u + v <= 1) { // we hit...so now to calculate...
+      f = ((pcen - p1) * normals[i] / ((pcen - pnewcen) * normals[i]));
+
+      if(f >= 0 && f < 1 && f < *fhit) {
+        *fhit = f;
+        rtni = i;
+      }
+    }
+  }
+
+  return rtni;
 }
 
 // called by plane...
 void Entity::RestingOnPlane(Vector3d bCenter, Vector3d bVelocity, float bRadius, double timeStep) {
 	// t is the distance from the center of the ball to the intersection on the plane
-	// t < 0 then it's behind the starting point 
+	// t < 0 then it's behind the starting point
 	// t == 0 then it's parallel and never hits
 	// t= (Xn dot (PointOnPLANE - Raystart)) / (Xn dot Raydirection)-- NeHe Collision Detection
 	//  Resting = Abs(timestep * Velocity.y) < EPS.y && Abs(Center.y - (Radius + miny)) < EPS.y;
@@ -119,18 +154,18 @@ void Entity::RestingOnPlane(Vector3d bCenter, Vector3d bVelocity, float bRadius,
 	int i;
 	double vN;
 	Vector3d avgN;
-	
+
 	for (i = 0; i < ntriangles; i++) {
 		avgN = avgN + normals[i];
 	}
-	
+
 	avgN = avgN / 2;
 	avgN.normalize();
 
-	t = avgN * (bCenter - vertices[1]); 
+	t = avgN * (bCenter - vertices[1]);
 	// account for radius
 	t = t - bRadius;
-	
+
 	vN = bVelocity * avgN;
 	EntState.SetCollidedN(avgN);
 	// Don't I need to figure out the velocity in the direction of the normal and see if it's
@@ -144,7 +179,7 @@ void Entity::RestingOnPlane(Vector3d bCenter, Vector3d bVelocity, float bRadius,
 // called by plane...
 int Entity::AccelOnPlane(Vector3d bAccel) {
 	double acceln;
-	
+
 	acceln = bAccel * EntState.GetCollidedN();
 
 	if (acceln < EntState.GetEPS()) { return true; }
@@ -196,3 +231,15 @@ Vector3d Entity::CalcVelocity(double timestep) { return EntState.CalcNewVelocity
 Vector3d Entity::CalcCenter(double timestep, double f) { return EntState.CalcNewPosition(timestep, f); }
 Vector3d Entity::CalcCenter(double timestep) { return EntState.CalcNewPosition(timestep); }
 void Entity::ScaleVel(Vector3d pnormal) { EntState.ScaleVelocity(pnormal); }
+
+
+// get triangle @ index & vertex @ index
+Vector3d Model::GetTriangle(int indx) {
+	Vector3d temp;
+	temp.set(triangles[indx][0], triangles[indx][1], triangles[indx][2]);
+	return temp;
+}
+
+Vector3d Model::GetVertex(int indx) { return vertices[indx]; }
+int Model::GetNtriangles() { return ntriangles; }
+Vector3d Model::GetNormal(int indx) { return normals[indx]; }

@@ -26,6 +26,7 @@ void Pmanager::SetStep(int type) { Step = type; }
 int Pmanager::IsStopped() { return Stopped; }
 int Pmanager::IsStarted() { return Started; }
 int Pmanager::IsStep() { return Step; }
+int Pmanager::GetNused() { return nused; }
 
 
 int Pmanager::HasFreeParticles() {
@@ -70,3 +71,28 @@ void Pmanager::CalcAccel(Vector3d g, Vector3d w, double v) {
 		Particles[i].SetAcceleration(a = a + v * (w - Particles[i].GetVelocity()) / Particles[i].GetMass());
 	}
 }
+
+
+void Pmanager::CalcTempCV(double ts) {
+    int i;
+
+    for (i = 0; i < nused; i++ ) {
+        //Velocity + timestep * Acceleration;
+        //Center + timestep * Velocity;
+        Particles[i].SetTempv(Particles[i].GetVelocity() + ts  * Particles[i].GetAcceleration());
+        Particles[i].SetTempc(Particles[i].GetCenter() + ts * Particles[i].GetAcceleration());
+    }
+}
+
+void Pmanager::CalcTempCV(double ts, double f) {
+    int i;
+
+    for (i = 0; i < nused; i++ ) {
+        //Velocity + f * timestep * Acceleration;
+        //Center + f * timestep * Velocity;
+        Particles[i].SetTempv(Particles[i].GetVelocity() + f * ts  * Particles[i].GetAcceleration());
+        Particles[i].SetTempc(Particles[i].GetCenter() + f * ts * Particles[i].GetVelocity());
+    }
+}
+
+
