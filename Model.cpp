@@ -492,3 +492,13 @@ void Model::Draw(const float* frontC, const float* backC){
   }
 }
 
+// get triangle @ index & vertex @ index
+Vector3d Model::GetTriangle(int indx) {
+	Vector3d temp;
+	temp.set(triangles[indx][0], triangles[indx][1], triangles[indx][2]);
+	return temp;
+}
+
+Vector3d Model::GetVertex(int indx) { return vertices[indx]; }
+int Model::GetNtriangles() { return ntriangles; }
+Vector3d Model::GetNormal(int indx) { return normals[indx]; }

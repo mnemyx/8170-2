@@ -73,12 +73,6 @@ class Entity : public Model {		// entity is a model that has a state...
 	Vector3d CalcCenter(double timestep, double f);
 	Vector3d CalcCenter(double timestep);
 	void ScaleVel(Vector3d pnormal);
-
-	  // get triangle @ index & vertex @ index
-  Vector3d GetTriangle(int indx);
-  Vector3d GetVertex(int indx);
-  int GetNtriangles();
-  Vector3d GetNormal(int indx);
 };
 
 #endif

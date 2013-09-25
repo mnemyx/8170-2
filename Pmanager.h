@@ -37,6 +37,9 @@ class Pmanager {
 		// determines if it has free particles
 		int HasFreeParticles();
 
+        // kill off particles..
+        void KillParticles(double timestep);
+
 		// assigns particle an initial velocity and center...
 		void UseParticle(Vector3d c0, Vector3d v0, int ts, Vector4d color, double m);
 

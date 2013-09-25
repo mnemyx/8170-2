@@ -30,8 +30,17 @@ int Pmanager::GetNused() { return nused; }
 
 
 int Pmanager::HasFreeParticles() {
-	if (nused >= MAXPART) return false;
-	else return true;
+    return MAXPART-nused;
+}
+
+void Pmanager::KillParticles(double ts) {
+    int i;
+
+    for (i = 0; i < nused; i++) {
+        if(Particles[i].GetAge(ts) > 10) {
+            FreeParticle(i);
+        }
+    }
 }
 
 void Pmanager::UseParticle(Vector3d c0, Vector3d v0, int ts, Vector4d color, double m) {

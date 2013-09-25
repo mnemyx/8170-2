@@ -68,6 +68,11 @@ public:
   void Draw(const float* color);
   void Draw(const float* frontC, const float* backC);
 
+  // get triangle @ index & vertex @ index
+  Vector3d GetTriangle(int indx);
+  Vector3d GetVertex(int indx);
+  int GetNtriangles();
+  Vector3d GetNormal(int indx);
 
 };
 

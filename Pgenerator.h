@@ -44,11 +44,13 @@ class Pgenerator {
 		Vector4d GeneratedColor;
 		double GeneratedMass;
 
+		int PNum;
+
 	public:
 		Pgenerator();
 
 		// setters
-		void SetBaseAttr(int type, double bs, double sd, double bm, double msd, Vector4d bc, double csd);
+		void SetBaseAttr(int type, double bs, double sd, double bm, double msd, Vector4d bc, double csd, double pnum);
 		void SetCenterRadius(Vector3d center, double radius);
 		void SetModel(int orientation = 2);
 		void SetBaseColor(Vector4d newbc);
@@ -61,6 +63,7 @@ class Pgenerator {
 		Vector3d GenC0();
 		Vector4d GenCol();
 		double GenMass();
+		int GetPNum();
 
 };
 

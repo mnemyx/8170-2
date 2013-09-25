@@ -233,13 +233,3 @@ Vector3d Entity::CalcCenter(double timestep) { return EntState.CalcNewPosition(t
 void Entity::ScaleVel(Vector3d pnormal) { EntState.ScaleVelocity(pnormal); }
 
 
-// get triangle @ index & vertex @ index
-Vector3d Entity::GetTriangle(int indx) {
-	Vector3d temp;
-	temp.set(triangles[indx][0], triangles[indx][1], triangles[indx][2]);
-	return temp;
-}
-
-Vector3d Entity::GetVertex(int indx) { return vertices[indx]; }
-int Entity::GetNtriangles() { return ntriangles; }
-Vector3d Entity::GetNormal(int indx) { return normals[indx]; }

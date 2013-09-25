@@ -1,6 +1,6 @@
 0.05	.1      5
 
-0       0       0       .5
+0       10
 10      5
 1       1       1       1       .25
 
@@ -14,12 +14,11 @@
 0
 
 
-===========================================
 parameters format
 ===========================================
 timestep    displaytime     #particlestogenerat
 
-basevelocity.x  basevelocity.y      basevelocity.z  vel_stddeviation
+basespeed       speed_stddeviation
 basemass        mass_stddeviation
 basecolor.r     basecolor.g         basecolor.b     basecolor.a         color_stddeviation
 

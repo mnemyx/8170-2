@@ -1,5 +1,5 @@
 /********************************************************
-  Sps.cpp
+  particles.cpp
 
   CPSC8170 - Proj 2   GBG   9/2013
 *********************************************************/
@@ -110,9 +110,8 @@ Pgenerator Generator;
 struct Env {
     Vector3d G;
     Vector3d Wind;
-    double  Viscosity;
-} env;
-
+    double Viscosity;
+ } env;
 
 /************** DRAWING & SHADING FUNCTIONS ***********************/
 //
@@ -145,7 +144,7 @@ void GetShading(int hueIndx) {
 // Draw the moving objects
 //
 void DrawMovingObj() {
-    Manager.DrawSystem()
+    Manager.DrawSystem();
 }
 
 //
@@ -176,7 +175,7 @@ void DrawScene(int collision, int cubeIndx){
   glClear(GL_COLOR_BUFFER_BIT);
   glClear(GL_DEPTH_BUFFER_BIT);
 
-  DrawNonMovingObj();
+  //DrawNonMovingObj();
   DrawMovingObj();
 
   glutSwapBuffers();
@@ -188,47 +187,58 @@ void DrawScene(int collision, int cubeIndx){
 //  Run a single time step in the simulation
 //
 void Simulate(){
-  int i, j, p, phit, objhit;
-  double f, fhit;
+    int i, j, p, phit, objhit, freep;
+    double f, fhit;
 
-  // don't do anything if our simulation is stopped
-  if(Manager.IsStopped()) {
-    return;
-  }
-
-  // for every particle the manager has....
-  for (j = 0; j < Manager.GetNused(); j++ ) {
-
-    // get the new acceleration
-    Manager.Particles[j].CalcAccel(env.G, env.Wind, env.Viscosity);
-    // evil Euler integration to get velocity and position at next timestep
-    Manager.Particles[j].CalcTempCV(TimeStep);
-
-    f = fhit = 100;
-    objhit = phit = -1;
-
-    for (i = 0; i < 6; i++) {
-      p = Cube[i].CheckCollision(Manager.Particles[j].GetCenter(), Manager.Particles[j].GetTempv(), Manager.Particles[j].GetTempc(), &fhit);
-
-      if(fhit >= 0 && fhit < 1 && fhit < f) {
-        f = fhit;
-        objhit = i;
-        phit = p;
-      }
+    // don't do anything if our simulation is stopped
+    if(Manager.IsStopped()) {
+        return;
     }
 
-    if(objhit != -1 && phit != -1) {
-      //if (!Cube[objhit].Rest()) {
-      // compute velocity & position for the ball at collision
-      Manager.CalcTempCV(TimeStep, TimeStep * f);
+    // for now, kill off particles whose age > 20
+    Manager.KillParticles(TimeStep);
 
-      // reflect it from the plane -- data during collision
-      Manager.Particles[j].SetVelocity(Manager.Particles[j].GetTempv());
-      Manager.Particles[j].Reflect(Cube[objhit].GetNormal(phit), Cube[objhit].GetVertex(Cube[objhit].GetTriangle(phit).x), f);
+    // generate particles if we can
+    if(freep = Manager.HasFreeParticles() > 0) {
+        int i;
+        for(i = 0; i < freep && i < Generator.GetPNum(); i++) {
+            Generator.GenerateAttr();
+            Manager.UseParticle(Generator.GenC0(), Generator.GenV0(), TimeStep, Generator.GenC0(), Generator.GenMass());
+        }
+    }
 
-      //DrawScene(1, ihit);  // should do something with this in terms of collision; change draw scene function
-      //}
+    // for every particle the manager has....
+    for (j = 0; j < Manager.GetNused(); j++ ) {
 
+        // get the new acceleration
+        Manager.Particles[j].CalcAccel(env.G, env.Wind, env.Viscosity);
+        // evil Euler integration to get velocity and position at next timestep
+        Manager.Particles[j].CalcTempCV(TimeStep);
+
+        f = fhit = 100;
+        objhit = phit = -1;
+
+        for (i = 0; i < 6; i++) {
+            p = Cube[i].CheckCollision(Manager.Particles[j].GetCenter(), Manager.Particles[j].GetTempv(), Manager.Particles[j].GetTempc(), &fhit);
+
+            if(fhit >= 0 && fhit < 1 && fhit < f) {
+                f = fhit;
+                objhit = i;
+                phit = p;
+            }
+        }
+
+        if(objhit != -1 && phit != -1) {
+          //if (!Cube[objhit].Rest()) {
+          // compute velocity & position for the ball at collision
+          Manager.Particles[j].CalcTempCV(TimeStep, TimeStep * f);
+
+          // reflect it from the plane -- data during collision
+          Manager.Particles[j].SetVelocity(Manager.Particles[j].GetTempv());
+          Manager.Particles[j].Reflect(Cube[objhit].GetNormal(phit), Cube[objhit].GetVertex(Cube[objhit].GetTriangle(phit).x), f);
+
+          //DrawScene(1, ihit);  // should do something with this in terms of collision; change draw scene function
+          //}
     }
   }
 
@@ -245,9 +255,9 @@ void Simulate(){
   // set up time for next timestep if in continuous mode
   glutIdleFunc(NULL);
   if(Manager.IsStep())
-    Manager.Stopped(true);
+    Manager.SetStopped(true);
   else{
-    Manager.Stopped(false);
+    Manager.SetStopped(false);
     glutTimerFunc(TimerDelay, TimerCallback, 0);
   }
 
@@ -266,42 +276,48 @@ void TimerCallback(int){
 //
 void LoadParameters(char *filename){
 
-  FILE *paramfile;
+    FILE *paramfile;
 
+    double numofparticles, bspeed, speedstd, bmass, bstd, colstd, coeffr, coefff;
+    Vector3d  bcenter;
+    Vector4d bcolor;
 
+    if((paramfile = fopen(filename, "r")) == NULL){
+        fprintf(stderr, "error opening parameter file %s\n", filename);
+        exit(1);
+    }
+    cout << filename << endl;
 
-  if((paramfile = fopen(filename, "r")) == NULL){
-    fprintf(stderr, "error opening parameter file %s\n", filename);
-    exit(1);
-  }
+    //ParamFilename = filename;
+    cout << " skaksdfasf "<< endl;
+    if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+    &TimeStep, &DispTime, &numofparticles,
+    &bspeed, &speedstd,
+    &bmass, &bstd,
+    &(bcolor.x), &(bcolor.y), &(bcolor.z), &(bcolor.w), &colstd,
+    &coeffr, &coefff,
+    &(bcenter.x), &(bcenter.y), &(bcenter.z),
+    &(env.Wind.x), &(env.Wind.y), &(env.Wind.z),
+    &(env.G.x), &(env.G.y), &(env.G.z),
+    &env.Viscosity) != 24){
+    cout << "ERROR" << endl;
+        fprintf(stderr, "error reading parameter file %s\n", filename);
+        fclose(paramfile);
+        exit(1);
+    }
 
-  ParamFilename = filename;
+    //Generator.SetBaseAttr(0, bspeed, speedstd, bmass, bstd, bcolor, colstd, numofparticles);
 
- if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
-	&TimeStep, &DispTime, &numofparticles,
-	&(bvelocity.x), &(bvelocity.y), &(bvelocity.z), &velstd
-	&bmass, &bstd,
-	&(bcolor.x), &(bcolor.y), &(bcolor.z), &(bcolor.a), &colstd,
-	&coeffr, &coefff
-	&(bcenter.x), &(bcenter.y), &(bcenter.z),
-	&(wind.x), &(wind.y), &(wind.z),
-	&(gravity.x), &(gravity.y), &(gravity.z),
-	&viscosity) != 25){
-    fprintf(stderr, "error reading parameter file %s\n", filename);
-    fclose(paramfile);
-    exit(1);
-  }
+    //Sp.InitState(bvelocity, bcenter, bmass, bradius, coeffr, coefff, beps, viscosity, wind, gravity);
+    //[0].InitState(plane1, plcen1, peps1);
+    //Cube[1].InitState(plane2, plcen2, peps2);
+    //Cube[2].InitState(plane3, plcen3, peps3);
+    //Cube[3].InitState(plane4, plcen4, peps4);
+    //Cube[4].InitState(plane5, plcen5, peps5);
+    //Cube[5].InitState(plane6, plcen6, peps6);
 
-  Sp.InitState(bvelocity, bcenter, bmass, bradius, coeffr, coefff, beps, viscosity, wind, gravity);
-  Cube[0].InitState(plane1, plcen1, peps1);
-  Cube[1].InitState(plane2, plcen2, peps2);
-  Cube[2].InitState(plane3, plcen3, peps3);
-  Cube[3].InitState(plane4, plcen4, peps4);
-  Cube[4].InitState(plane5, plcen5, peps5);
-  Cube[5].InitState(plane6, plcen6, peps6);
-
-  TimeStepsPerDisplay = Max(1, int(DispTime / TimeStep + 0.5));
-  TimerDelay = int(0.5 * TimeStep * 1000);
+    TimeStepsPerDisplay = Max(1, int(DispTime / TimeStep + 0.5));
+    TimerDelay = int(0.5 * TimeStep * 1000);
 }
 
 //
@@ -318,9 +334,6 @@ void RestartSim(){
   glutIdleFunc(NULL);
   Time = 0;
 
-  Sp.Center(Sp.InitialCenter());
-  Sp.Velocity(Sp.InitialVelocity());
-
   DrawScene(0, 0);
 }
 
@@ -331,7 +344,9 @@ void RestartSim(){
 //
 void InitSimulation(int argc, char* argv[]){
 
+cout << "argc: " << argc << endl;
   if(argc != 2){
+  cout << "really?" << endl;
     fprintf(stderr, "usage: particles paramfile\n");
     exit(1);
   }
@@ -541,7 +556,7 @@ void HandleMenu(int index){
   switch(index){
 
   case MenuContinuous:
-    if(Manager.Step()){
+    if(Manager.IsStep()){
       Manager.SetStep(false);
       glutChangeToMenuEntry(index, "Step", index);
     }
