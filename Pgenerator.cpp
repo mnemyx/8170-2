@@ -36,7 +36,7 @@ void Pgenerator::SetCenterRadius(Vector3d center, double radius) {
 void Pgenerator::SetModel(int orientation) {
 	switch (Type) {
 		case CIRCLE: Shape.BuildCircle(Radius, orientation, Center.x, Center.y, Center.z); break;
-		case SPHERE: Shape.BuildSphere(Radius, 3, Center.x, Center.y, Center.z); break;
+		case SPHERE: Shape.BuildSphere(Radius, 1, Center.x, Center.y, Center.z); break;
 	}
 }
 
@@ -49,8 +49,8 @@ void Pgenerator::GenerateAttr() {
 	smallv.set(drand48() * drand48(), drand48() * drand48(), drand48() * drand48());
 
 	// get random theta and phi
-	double theta = drand48();
-	double phi = drand48();
+	double theta = drand48() * 360;
+	double phi = drand48() * 360;
 	Vector3d unit;
 
 	// for triangles- need random index, need temp vectors, u & v
@@ -95,6 +95,11 @@ void Pgenerator::GenerateAttr() {
 	GeneratedColor.set(gauss(BaseColor.x, CStdDev, 0), gauss(BaseColor.y, CStdDev, 0), gauss(BaseColor.z, CStdDev, 0), 1);
 }
 
+Vector4d Pgenerator::GenerateColor(Vector4d c) {
+    Vector4d newc;
+    newc.set(gauss(c.x, CStdDev, 0), gauss(c.y, CStdDev, 0), gauss(c.z, CStdDev, 0), 1);
+    return newc;
+}
 
 // generate random velocity, center, color, mass
 Vector3d Pgenerator::GenV0() { return GeneratedV0; }

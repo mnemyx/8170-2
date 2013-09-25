@@ -105,7 +105,6 @@ static double Time = 0;
 Pmanager Manager;
 Pgenerator Generator;
 Entity Sp;
-Entity Cyl;
 
 struct Env {
     Vector3d G;
@@ -158,7 +157,6 @@ void DrawNonMovingObj() {
 
   //GetShading(3);
   Sp.Draw(1);
-  Cyl.Draw(1);
 }
 
 //
@@ -184,9 +182,8 @@ void DrawScene(int collision, int cubeIndx){
 //  Run a single time step in the simulation
 //
 void Simulate(){
-    int i, j, p, phit, objhit, freep;
-    double f, fhit;
-    Vector3d temphit;
+    int i, j, p, phit, freep, ahit;
+    Vector3d temphit, p0, p1, g;
 
     // don't do anything if our simulation is stopped
     if(Manager.IsStopped()) {
@@ -201,27 +198,31 @@ void Simulate(){
 
         // get the new acceleration
         Manager.Particles[j].CalcAccel(env.G, env.Wind, env.Viscosity);
+
+        //check if we hit within the attractor's grasp
+
+
         // evil Euler integration to get velocity and position at next timestep
         Manager.Particles[j].CalcTempCV(TimeStep);
 
-       // Manager.Particles[j].PrintAttr();
-        f = 100;
+        // Manager.Particles[j].PrintAttr();
+        if((int)Manager.Particles[j].GetAge(Time) % 5 == 0)
+            Manager.Particles[j].SetColor(Generator.GenerateColor(Manager.Particles[j].GetColor()));
+
         phit = -1;
-        phit = Sp.CheckCollision(Manager.Particles[j].GetCenter(), Manager.Particles[j].GetTempv(), Manager.Particles[j].GetTempc(), &f, &temphit);
+        phit = Sp.CheckCollision(Manager.Particles[j].GetCenter(), Manager.Particles[j].GetTempv(), Manager.Particles[j].GetTempc());
 
 
         if(phit != -1) {
-          // compute velocity & position for the ball at collision
-          Manager.Particles[j].CalcTempCV(TimeStep, TimeStep * f);
-
           // reflect it from the plane -- data during collision
-          Manager.Particles[j].Reflect(Sp.GetNormal(phit), Sp.GetVertex(Sp.GetTriangle(phit).x), f, temphit);
+          Manager.Particles[j].Reflect(Sp.GetNormal(phit), Sp.GetVertex(Sp.GetTriangle(phit).x));
 
           //DrawScene(1, ihit);  // should do something with this in terms of collision; change draw scene function
         } else {
             Manager.Particles[j].SetVelocity(Manager.Particles[j].GetTempv());
             Manager.Particles[j].SetCenter(Manager.Particles[j].GetTempc());
         }
+
     }
 
 
@@ -330,8 +331,7 @@ void InitSimulation(int argc, char* argv[]){
 
   LoadParameters(argv[1]);
 
-  Sp.BuildSphere(20,1,0,20,0);
-  Cyl.BuildCylinder(5, 100);
+  Sp.BuildSphere(20,1,0,0,0);
 
   NSteps = 0;
   NTimeSteps = -1;

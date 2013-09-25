@@ -50,7 +50,8 @@ class Particle {
 		void CalcAccel(Vector3d g, Vector3d w, double v);   // calculate acceleration - need to consider how to handle accel ops
 		void CalcTempCV(double ts);     // calculate temp velocity & center;
 		void CalcTempCV(double ts, double f);   // calculate temp velocity & center;
-		void Reflect(Vector3d pnormal, Vector3d pvertex, double fhit, Vector3d temphit);    // reflect the particle given the triangle's normal and vertex index
+		void CalcAttractAccel(double length, double radius, Vector3d p0, Vector3d p1, Vector3d g);
+		void Reflect(Vector3d pnormal, Vector3d pvertex);    // reflect the particle given the triangle's normal and vertex index
 
 		//////////// SETTERS //////////////
 		void SetV0(Vector3d v);
@@ -81,6 +82,7 @@ class Particle {
 		Vector3d GetTempc();
 		Vector3d GetTempv();
         double GetBirth();
+        Vector4d GetColor();
 
         //////////// DEBUGGING ///////////////
         void PrintAttr();

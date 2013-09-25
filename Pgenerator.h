@@ -59,6 +59,7 @@ class Pgenerator {
 
 		// generate random velocity, center, color, mass
 		void GenerateAttr();
+		Vector4d GenerateColor(Vector4d c);
 
 		// technically getters
 		Vector3d GenV0();

@@ -56,7 +56,7 @@ class Entity : public Model {		// entity is a model that has a state...
 	// Functions
 	/* called by nonmoving objects */
 	float PlaneBallColl(Vector3d bCenter, Vector3d bVelocity, Vector3d bNewCenter, float bRadius);
-  int CheckCollision(Vector3d pcen, Vector3d pvel, Vector3d pnewcen, double *fhit, Vector3d *temphit);
+    int CheckCollision(Vector3d pcen, Vector3d pvel, Vector3d pnewcen);
 	void RestingOnPlane(Vector3d bCenter, Vector3d bVelocity, float bRadius, double timeStep);
 	int AccelOnPlane(Vector3d bAccel);
 	int VelOnPlane(Vector3d bVelocity);
