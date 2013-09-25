@@ -268,15 +268,7 @@ void LoadParameters(char *filename){
 
   FILE *paramfile;
 
-  Vector3d bvelocity;
-  Vector3d bcenter;
-  double bmass, bradius, coeffr, coefff, beps, viscosity;
-  Vector3d wind;
-  Vector3d gravity;
 
-  Vector3d plane1, plane2, plane3, plane4, plane5, plane6;
-  Vector3d plcen1, plcen2, plcen3, plcen4, plcen5, plcen6;
-  double peps1, peps2, peps3, peps4, peps5, peps6;
 
   if((paramfile = fopen(filename, "r")) == NULL){
     fprintf(stderr, "error opening parameter file %s\n", filename);
@@ -285,17 +277,16 @@ void LoadParameters(char *filename){
 
   ParamFilename = filename;
 
- if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
-	&(bvelocity.x), &(bvelocity.y), &(bvelocity.z), &(bcenter.x), &(bcenter.y), &(bcenter.z),
-	&bmass, &bradius, &coeffr, &coefff, &beps,
-	&(wind.x), &(wind.y), &(wind.z), &(gravity.x), &(gravity.y), &(gravity.z), &viscosity,
-	&(plane1.x), &(plane1.y), &(plane1.z), &(plcen1.x), &(plcen1.y), &(plcen1.z), &peps1,
-	&(plane2.x), &(plane2.y), &(plane2.z), &(plcen2.x), &(plcen2.y), &(plcen2.z), &peps2,
-	&(plane3.x), &(plane3.y), &(plane3.z), &(plcen3.x), &(plcen3.y), &(plcen3.z), &peps3,
-	&(plane4.x), &(plane4.y), &(plane4.z), &(plcen4.x), &(plcen4.y), &(plcen4.z), &peps4,
-	&(plane5.x), &(plane5.y), &(plane5.z), &(plcen5.x), &(plcen5.y), &(plcen5.z), &peps5,
-	&(plane6.x), &(plane6.y), &(plane6.z), &(plcen6.x), &(plcen6.y), &(plcen6.z), &peps6,
-	&TimeStep, &DispTime) != 62){
+ if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+	&TimeStep, &DispTime, &numofparticles,
+	&(bvelocity.x), &(bvelocity.y), &(bvelocity.z), &velstd
+	&bmass, &bstd,
+	&(bcolor.x), &(bcolor.y), &(bcolor.z), &(bcolor.a), &colstd,
+	&coeffr, &coefff
+	&(bcenter.x), &(bcenter.y), &(bcenter.z),
+	&(wind.x), &(wind.y), &(wind.z),
+	&(gravity.x), &(gravity.y), &(gravity.z),
+	&viscosity) != 25){
     fprintf(stderr, "error reading parameter file %s\n", filename);
     fclose(paramfile);
     exit(1);

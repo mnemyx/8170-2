@@ -2,8 +2,8 @@
   Pgenerator.h
 
   Header File for the particle generator class
-  
-  Gina Guerrero - Fall 2013 
+
+  Gina Guerrero - Fall 2013
 ********************************************************/
 
 
@@ -24,12 +24,12 @@ class Pgenerator {
 	private:
 		int Type;
 		Model Shape;
-		
+
 		Vector3d Center;
 		//Vector3d Velocity;		// could be moving...but uh, for now, let's not move it.
-		
-		double Radius;
-		
+
+		double Radius;              // if it's a sphere?
+
 		// i need a base for the stuff...
 		double Mean;
 		double StdDev;
@@ -37,16 +37,16 @@ class Pgenerator {
 		double MStdDev;
 		Vector4d BaseColor;
 		double CStdDev;
-		
+
 		// because I'm too lazy to create a struct? is the overhead going to be that bad?
 		Vector3d GeneratedV0;
 		Vector3d GeneratedC0;
 		Vector4d GeneratedColor;
 		double GeneratedMass;
-		
+
 	public:
 		Pgenerator();
-		
+
 		// setters
 		void SetBaseAttr(int type, double bs, double sd, double bm, double msd, Vector4d bc, double csd);
 		void SetCenterRadius(Vector3d center, double radius);
@@ -55,13 +55,13 @@ class Pgenerator {
 
 		// generate random velocity, center, color, mass
 		void GenerateAttr();
-		
+
 		// technically getters
 		Vector3d GenV0();
 		Vector3d GenC0();
 		Vector4d GenCol();
 		double GenMass();
-		
+
 };
 
 #endif
