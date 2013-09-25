@@ -47,7 +47,10 @@ class Particle {
 		void Reset();					// gets called by the constructor. kind of cleans up..
 		Particle();						// defaults...
 		void Draw();					// draws the particle
-		void ReflectVel(Vector3d pnormal, Vector3d pvertex);    // reflect the particle given the triangle's normal and vertex index
+		void CalcAccel(Vector3d g, Vector3d w, double v);   // calculate acceleration - need to consider how to handle accel ops
+		void CalcTempCV(double ts);     // calculate temp velocity & center;
+		void CalcTempCV(double ts, double f);   // calculate temp velocity & center;
+		void Reflect(Vector3d pnormal, Vector3d pvertex, double fhit);    // reflect the particle given the triangle's normal and vertex index
 
 		//////////// SETTERS //////////////
 		void SetV0(Vector3d v);

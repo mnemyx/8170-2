@@ -144,21 +144,8 @@ void GetShading(int hueIndx) {
 //
 // Draw the moving objects
 //
-void DrawMovingObj(int collision) {
-  glEnable(GL_DEPTH_TEST);
-  glEnable(GL_CULL_FACE);
-  glEnable(GL_BLEND);
-  glDepthMask(GL_TRUE);
-
-  if(collision) {
-	  GetShading(3);
-	  Sp.UpdateModel();
-	  Sp.Draw(YELLOW);
-  } else {
-	  GetShading(2);
-	  Sp.UpdateModel();
-	  Sp.Draw(VIOLET);
-  }
+void DrawMovingObj() {
+    Manager.DrawSystem()
 }
 
 //
@@ -190,22 +177,9 @@ void DrawScene(int collision, int cubeIndx){
   glClear(GL_DEPTH_BUFFER_BIT);
 
   DrawNonMovingObj();
-
-  if(collision) DrawMovingObj(1);
-  else DrawMovingObj(0);
+  DrawMovingObj();
 
   glutSwapBuffers();
-
-  if(NSteps < MAXSTEPS){
-	Cube[cubeIndx].AddOCenter(NSteps);
-	Cube[cubeIndx].AddOCollision(collision, NSteps);
-    NSteps++;
-  }
-  else{
-    cerr << "Ball position table overflow, restarting!!" << endl;
-    Time = 0;
-    NSteps = 0;
-  }
 }
 
 
@@ -214,95 +188,48 @@ void DrawScene(int collision, int cubeIndx){
 //  Run a single time step in the simulation
 //
 void Simulate(){
-  int i, j, p, pindx, objhit;
-  Vector3d acceleration;
-  Vector3d newvelocity, newball;
-  double tn = TimeStep;
-  double f = 100;
-  int ihit = -1;
-  double fhit, dt;
+  int i, j, p, phit, objhit;
+  double f, fhit;
 
-  // don't do anything if our moving object isn't, well, moving.
+  // don't do anything if our simulation is stopped
   if(Manager.IsStopped()) {
     return;
   }
 
-  //
-  // set the ball's resting...for all the planes...
-  //for (i = 0; i < 6; i++) {
-	 // Cube[i].RestingOnPlane(Sp.Center(), Sp.Velocity(), Sp.Radius(), TimeStep);
-  //}
-
-  // get the new acceleration
-  Manager.CalcAccel(env.G, env.Wind, env.Viscosity);
-
-  // if ball in resting contact, and its acceleration is zero or down in the direction of the plane...
-  // then cancel the velocity in the direction of the normal and...uhm...set the ball down on the plane...?
-  // Clear resting contact if acceleration is up.
-  //for (i = 0; i < 6; i++) {
-	 // if(Cube[i].Rest() && Cube[i].AccelOnPlane(Sp.Acceleration())) {
-		 // Sp.AdjustAVC(Cube[i].PlaneNormal(), Cube[i].PlaneVertex());
-	  //}
-	 // else Cube[i].Rest(false);
- // }
-
-  // evil Euler integration to get velocity and position at next timestep
-  Manager.CalcTempCV(TimeStep);
-
-
-  // rewriting the one from below according to house's notes from 9/10
+  // for every particle the manager has....
   for (j = 0; j < Manager.GetNused(); j++ ) {
-    tn = TimeStep;
 
-    while(tn > 0) {
-      for (i = 0; i < 6; i++) {
-        objhit = -1;
-        fhit = 100;
-        phit = -1;
+    // get the new acceleration
+    Manager.Particles[j].CalcAccel(env.G, env.Wind, env.Viscosity);
+    // evil Euler integration to get velocity and position at next timestep
+    Manager.Particles[j].CalcTempCV(TimeStep);
 
-        p = Cube[i].CheckCollision(Sp.Center(), newvelocity, newball, &fhit);
+    f = fhit = 100;
+    objhit = phit = -1;
 
-        if(fhit >= 0 && fhit < 1 && fhit < f) {
-          f = fhit;
-          objhit = i;
-          pindx = p;
-        }
-      }
+    for (i = 0; i < 6; i++) {
+      p = Cube[i].CheckCollision(Manager.Particles[j].GetCenter(), Manager.Particles[j].GetTempv(), Manager.Particles[j].GetTempc(), &fhit);
 
-      if(objhit != -1 && phit != -1) {
-        //if (!Cube[objhit].Rest()) {
-          // get the fraction...of the fraction of the time step.
-          dt = f * tn;
-
-          // compute velocity & position for the ball at collision
-          Manager.CalcTempCV(tn, dt);
-
-          // reflect it from the plane -- data during collision
-          Manager.Particles[j].SetVelocity(Manager.Particles[j].GetTempv());
-          Manager.Particles[j].ReflectVel(Cube[objhit].GetNormal(pindx), Cube[objhit].GetVertex(Cube[objhit].GetTriangle(pindx).x));
-
-
-          Sp.Velocity(newvelocity);
-          Sp.ScaleVel(Cube[ihit].PlaneNormal());  // stores this into Sp->Velocity
-          Sp.Center(newball);
-
-          DrawScene(1, ihit);  // should do something with this in terms of collision; change draw scene function
-
-          dt = (1 - f) * tn;
-          // finish the integrating
-          Sp.Accel();
-          newvelocity = Sp.CalcVelocity(tn, 1 - (dt * f));
-          newball = Sp.CalcCenter(tn, 1 - (dt * f));
-
-          tn = tn - (tn * f);
-        //}
-
-      } else {
-        tn = -1;
+      if(fhit >= 0 && fhit < 1 && fhit < f) {
+        f = fhit;
+        objhit = i;
+        phit = p;
       }
     }
-    Sp.Velocity(newvelocity);
-    Sp.Center(newball);
+
+    if(objhit != -1 && phit != -1) {
+      //if (!Cube[objhit].Rest()) {
+      // compute velocity & position for the ball at collision
+      Manager.CalcTempCV(TimeStep, TimeStep * f);
+
+      // reflect it from the plane -- data during collision
+      Manager.Particles[j].SetVelocity(Manager.Particles[j].GetTempv());
+      Manager.Particles[j].Reflect(Cube[objhit].GetNormal(phit), Cube[objhit].GetVertex(Cube[objhit].GetTriangle(phit).x), f);
+
+      //DrawScene(1, ihit);  // should do something with this in terms of collision; change draw scene function
+      //}
+
+    }
   }
 
   // advance the real timestep
@@ -317,10 +244,10 @@ void Simulate(){
 
   // set up time for next timestep if in continuous mode
   glutIdleFunc(NULL);
-  if(Sp.Step())
-    Sp.Stopped(true);
+  if(Manager.IsStep())
+    Manager.Stopped(true);
   else{
-    Sp.Stopped(false);
+    Manager.Stopped(false);
     glutTimerFunc(TimerDelay, TimerCallback, 0);
   }
 
@@ -389,7 +316,7 @@ void LoadParameters(char *filename){
 //
 // Routine to restart the ball at the top
 //
-void RestartBall(){
+void RestartSim(){
 
   LoadParameters(ParamFilename); // reload parameters in case changed
 
@@ -414,7 +341,7 @@ void RestartBall(){
 void InitSimulation(int argc, char* argv[]){
 
   if(argc != 2){
-    fprintf(stderr, "usage: ballbox paramfile\n");
+    fprintf(stderr, "usage: particles paramfile\n");
     exit(1);
   }
 
@@ -431,9 +358,9 @@ void InitSimulation(int argc, char* argv[]){
 void InitCamera() {
   Projection = PERSPECTIVE;
 
-  glEnable(GL_LIGHTING);
-  glEnable(GL_DEPTH_TEST);
-  glEnable(GL_BLEND);
+  glDisable(GL_LIGHTING);
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_BLEND);
 
   MenuAttached = false;
 
@@ -585,20 +512,19 @@ void handleButton(int button, int state, int x, int y){
     AdjustMouse(x, y);	/* adjust mouse coords to current window size */
 
     if(state == GLUT_UP){
-      if(Sp.Start()){
-        Sp.Start(false);
-        Sp.Stopped(false);
-        Sp.Center(Sp.InitialCenter());
-	    Sp.Velocity(Sp.InitialVelocity());
+      if(Manager.IsStarted()){
+        Manager.SetStarted(false);
+        Manager.SetStopped(false);
+        // need to re-initialize...should move to key press?
         DrawScene(0,0);
         glutIdleFunc(Simulate);
       }
-      else if(Sp.Stopped()){
-        Sp.Stopped(false);
+      else if(Manager.IsStopped()){
+        Manager.SetStopped(false);
         glutIdleFunc(Simulate);
       }
       else{
-        Sp.Stopped(true);
+        Manager.SetStopped(true);
         glutIdleFunc(NULL);
       }
     }
@@ -624,30 +550,29 @@ void HandleMenu(int index){
   switch(index){
 
   case MenuContinuous:
-    if(Sp.Step()){
-      Sp.Step(false);
+    if(Manager.Step()){
+      Manager.SetStep(false);
       glutChangeToMenuEntry(index, "Step", index);
     }
     else{
-      Sp.Step(true);
+      Manager.SetStep(true);
       glutChangeToMenuEntry(index, "Continuous", index);
     }
     break;
 
   case MenuReset:
-    RestartBall();
+    RestartSim();
     break;
 
   case MenuClean:
     NSteps = 0;
-    RestartBall();
+    RestartSim();
     break;
 
   case MenuQuit:
     exit(0);
   }
 }
-
 
 //
 //  Set up pop-up menu on right mouse button
@@ -710,7 +635,7 @@ int main(int argc, char* argv[]){
   /* open window and establish coordinate system on it */
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
   glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-  glutCreateWindow("Bouncing Ball in Box Demo");
+  glutCreateWindow("Particle Simulation");
 
   /* register display and mouse-button callback routines */
   glutReshapeFunc(doReshape);

@@ -37,30 +37,58 @@ Particle::Particle(){
 }
 
 void Particle::Draw() {
+    glDisable(GL_LIGHTING);
+    glEnable(GL_SMOOTH);
+    glEnable(GL_BLEND);
+
     glColor4f(Color.x, Color.y, Color.z, Color.w);
 
 	glBegin(GL_POINTS);
 		glVertex3f(Center.x, Center.y, Center.z);
-	glEnd( );
+	glEnd();
+
+	glDisable(GL_BLEND);
+	glDisable(GL_SMOOTH);
+	glEnable(GL_LIGHTING);
 }
 
+void Particle::CalcAccel(Vector3d g, Vector3d w, double v) {
+	Vector3d a;
+
+	a = g;
+
+    //Acceleration = Acceleration + Viscosity * (Wind - Velocity) / Mass;
+    Acceleration = a + v * (w - Velocity) / Mass;
+}
+
+
+void Particle::CalcTempCV(double ts) {
+    //Velocity + timestep * Acceleration;
+    //Center + timestep * Velocity;
+    tempv = Velocity + ts * Acceleration;
+    tempc = Velocity + ts * Acceleration;
+}
+
+void Particle::CalcTempCV(double ts, double f) {
+    //Velocity + f * timestep * Acceleration;
+    //Center + f * timestep * Velocity;
+    tempv = Velocity + f * ts * Acceleration;
+    tempc = Center + f * ts * Velocity;
+}
+
+
 // reflect velocity off of plane
-void Particle::ReflectVel(Vector3d pnormal, Vector3d pvertex) {
-	Vector3d vn, vt;
-	Vector3d unorm;
+void Particle::Reflect(Vector3d pnormal, Vector3d pvertex, double fhit) {
+    Vector3d vn, vt;
 
-	unorm.set(pnormal.normalize());
+    if (Velocity * pnormal == 0) vn.set(0,0,0);
+    else vn = (Velocity * pnormal) * pnormal;
 
-	if (Velocity * unorm == 0) vn.set(0,0,0);
-	else vn = (Velocity * unorm) * unorm;
+    if (Velocity * pnormal == 0) vt = Velocity;
+    else vt = Velocity - (Velocity * pnormal) * pnormal;
 
-	if (Velocity * unorm == 0) vt = Velocity;
-	else vt = Velocity - (Velocity * unorm) * unorm;
-
-	vn = -CoeffofRestitution * vn;
-	vt = (1 - CoeffofFriction) * vt;
-
-	Velocity = vn + vt;
+    Center = (Center + fhit * Velocity) + .00001 ;  // need the center before we flip the velocity.
+    Velocity = Velocity - ((1 + Coeffr) * (vn)) - ((1 - Coefff) * vt);
 }
 
 //////////// SETTERS //////////////

@@ -60,39 +60,6 @@ void Pmanager::DrawSystem() {
 	for ( i = 0; i < nused; i++ ) Particles[i].Draw();
 }
 
-void Pmanager::CalcAccel(Vector3d g, Vector3d w, double v) {
-	int i;
-	Vector3d a;
 
-	a = g;
-
-	for (i = 0; i < nused; i++ ) {
-		//Acceleration = Acceleration + Viscosity * (Wind - Velocity) / Mass;
-		Particles[i].SetAcceleration(a = a + v * (w - Particles[i].GetVelocity()) / Particles[i].GetMass());
-	}
-}
-
-
-void Pmanager::CalcTempCV(double ts) {
-    int i;
-
-    for (i = 0; i < nused; i++ ) {
-        //Velocity + timestep * Acceleration;
-        //Center + timestep * Velocity;
-        Particles[i].SetTempv(Particles[i].GetVelocity() + ts  * Particles[i].GetAcceleration());
-        Particles[i].SetTempc(Particles[i].GetCenter() + ts * Particles[i].GetAcceleration());
-    }
-}
-
-void Pmanager::CalcTempCV(double ts, double f) {
-    int i;
-
-    for (i = 0; i < nused; i++ ) {
-        //Velocity + f * timestep * Acceleration;
-        //Center + f * timestep * Velocity;
-        Particles[i].SetTempv(Particles[i].GetVelocity() + f * ts  * Particles[i].GetAcceleration());
-        Particles[i].SetTempc(Particles[i].GetCenter() + f * ts * Particles[i].GetVelocity());
-    }
-}
 
 
