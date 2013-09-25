@@ -15,7 +15,7 @@ Pgenerator::Pgenerator() {
 	gauss(1,1,time(0));
 }
 
-void Pgenerator::SetBaseAttr(int type, double bs, double sd, double bm, double msd, Vector4d bc, double csd, double pnum) {
+void Pgenerator::SetBaseAttr(int type, double bs, double sd, double bm, double msd, Vector4d bc, double csd, double pnum, double coefff, double coeffr) {
 	Type = type;
 	Mean = bs;
 	StdDev = sd;
@@ -24,7 +24,8 @@ void Pgenerator::SetBaseAttr(int type, double bs, double sd, double bm, double m
 	BaseColor = bc;
 	CStdDev = csd;
 	PNum = pnum;
-	cout << "HI?" << endl;
+	BaseCoefff = coefff;
+	BaseCoeffr = coeffr;
 }
 
 void Pgenerator::SetCenterRadius(Vector3d center, double radius) {
@@ -90,7 +91,8 @@ void Pgenerator::GenerateAttr() {
 
 	// figure out a random mass and color
 	GeneratedMass = gauss(BaseMass, MStdDev, 0);
-	GeneratedColor.set(gauss(BaseColor.x, CStdDev, 0), gauss(BaseColor.y, CStdDev, 0), gauss(BaseColor.z, CStdDev, 0), gauss(BaseColor.w, CStdDev, 0));
+	//GeneratedColor.set(1,1,1,1);
+	GeneratedColor.set(gauss(BaseColor.x, CStdDev, 0), gauss(BaseColor.y, CStdDev, 0), gauss(BaseColor.z, CStdDev, 0), 1);
 }
 
 
@@ -100,3 +102,5 @@ Vector3d Pgenerator::GenC0() { return GeneratedC0; }
 Vector4d Pgenerator::GenCol() { return GeneratedColor; }
 double Pgenerator::GenMass() { return GeneratedMass; }
 int Pgenerator::GetPNum() { return PNum; }
+double Pgenerator::GetCoefff() { return BaseCoefff; }
+double Pgenerator::GetCoeffr() { return BaseCoeffr; }

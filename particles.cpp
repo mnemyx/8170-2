@@ -53,7 +53,7 @@ const float BRIGHT_PALEBLUE[] = {0.5, 0.5, 1, 0.25};
 const float WHITE[] = {1, 1, 1, 1};
 const float VIOLET[] = {1, 0, 0.5, 1};
 const float YELLOW[] = {1, 1, 0, 1};
-const float BG[] = {0.3, 0.3, 0.3};
+const float BG[] = {0, 0, 0};
 
 float hues[][4] = { {1, 1, 1},    // white
 		    {0.5, 0.5, 1},    // dim paleblue
@@ -102,10 +102,10 @@ static int NSteps = 0;
 static int NTimeSteps = -1;
 static double Time = 0;
 
-Entity Sp;
-Entity Cube[6];
 Pmanager Manager;
 Pgenerator Generator;
+Entity Sp;
+Entity Cyl;
 
 struct Env {
     Vector3d G;
@@ -151,17 +151,14 @@ void DrawMovingObj() {
 // Draw the non moving objects
 //
 void DrawNonMovingObj() {
-  int i;
-  glEnable(GL_DEPTH_TEST);
-  glEnable(GL_CULL_FACE);
-  glEnable(GL_BLEND);
-  glDepthMask(GL_TRUE);
+  //int i;
+  //glEnable(GL_DEPTH_TEST);
+  //glEnable(GL_BLEND);
+  //glDepthMask(GL_TRUE);
 
-  GetShading(1);
-  for ( i = 0; i < 6; i++ ) {
-	  Cube[i].Draw(BRIGHT_PALEBLUE);
-  }
-
+  //GetShading(3);
+  Sp.Draw(1);
+  Cyl.Draw(1);
 }
 
 //
@@ -175,7 +172,7 @@ void DrawScene(int collision, int cubeIndx){
   glClear(GL_COLOR_BUFFER_BIT);
   glClear(GL_DEPTH_BUFFER_BIT);
 
-  //DrawNonMovingObj();
+  DrawNonMovingObj();
   DrawMovingObj();
 
   glutSwapBuffers();
@@ -189,6 +186,7 @@ void DrawScene(int collision, int cubeIndx){
 void Simulate(){
     int i, j, p, phit, objhit, freep;
     double f, fhit;
+    Vector3d temphit;
 
     // don't do anything if our simulation is stopped
     if(Manager.IsStopped()) {
@@ -196,16 +194,7 @@ void Simulate(){
     }
 
     // for now, kill off particles whose age > 20
-    Manager.KillParticles(TimeStep);
-
-    // generate particles if we can
-    if(freep = Manager.HasFreeParticles() > 0) {
-        int i;
-        for(i = 0; i < freep && i < Generator.GetPNum(); i++) {
-            Generator.GenerateAttr();
-            Manager.UseParticle(Generator.GenC0(), Generator.GenV0(), TimeStep, Generator.GenC0(), Generator.GenMass());
-        }
-    }
+    int killed = Manager.KillParticles(Time);
 
     // for every particle the manager has....
     for (j = 0; j < Manager.GetNused(); j++ ) {
@@ -215,51 +204,53 @@ void Simulate(){
         // evil Euler integration to get velocity and position at next timestep
         Manager.Particles[j].CalcTempCV(TimeStep);
 
-        f = fhit = 100;
-        objhit = phit = -1;
+       // Manager.Particles[j].PrintAttr();
+        f = 100;
+        phit = -1;
+        phit = Sp.CheckCollision(Manager.Particles[j].GetCenter(), Manager.Particles[j].GetTempv(), Manager.Particles[j].GetTempc(), &f, &temphit);
 
-        for (i = 0; i < 6; i++) {
-            p = Cube[i].CheckCollision(Manager.Particles[j].GetCenter(), Manager.Particles[j].GetTempv(), Manager.Particles[j].GetTempc(), &fhit);
 
-            if(fhit >= 0 && fhit < 1 && fhit < f) {
-                f = fhit;
-                objhit = i;
-                phit = p;
-            }
-        }
-
-        if(objhit != -1 && phit != -1) {
-          //if (!Cube[objhit].Rest()) {
+        if(phit != -1) {
           // compute velocity & position for the ball at collision
           Manager.Particles[j].CalcTempCV(TimeStep, TimeStep * f);
 
           // reflect it from the plane -- data during collision
-          Manager.Particles[j].SetVelocity(Manager.Particles[j].GetTempv());
-          Manager.Particles[j].Reflect(Cube[objhit].GetNormal(phit), Cube[objhit].GetVertex(Cube[objhit].GetTriangle(phit).x), f);
+          Manager.Particles[j].Reflect(Sp.GetNormal(phit), Sp.GetVertex(Sp.GetTriangle(phit).x), f, temphit);
 
           //DrawScene(1, ihit);  // should do something with this in terms of collision; change draw scene function
-          //}
+        } else {
+            Manager.Particles[j].SetVelocity(Manager.Particles[j].GetTempv());
+            Manager.Particles[j].SetCenter(Manager.Particles[j].GetTempc());
+        }
     }
-  }
 
-  // advance the real timestep
-  Time += TimeStep;
-  NTimeSteps++;
 
-  ///////////////////////////////////////////////////////////////////////
+    // generate particles if we can
+    if(freep = Manager.HasFreeParticles() > 0) {
+        for(i = 0; i < freep || i < Generator.GetPNum(); i++) {
+            Generator.GenerateAttr();
+            Manager.UseParticle(Generator.GenC0(), Generator.GenV0(), Time, Generator.GenC0(), Generator.GenMass(), Generator.GetCoefff(), Generator.GetCoeffr());
+        }
+    }
 
-  // draw only if we are at a display time
-  if(NTimeSteps % TimeStepsPerDisplay == 0)
+    // advance the real timestep
+    Time += TimeStep;
+    NTimeSteps++;
+
+    ///////////////////////////////////////////////////////////////////////
+
+    // draw only if we are at a display time
+    if(NTimeSteps % TimeStepsPerDisplay == 0)
     DrawScene(0,0);
 
-  // set up time for next timestep if in continuous mode
-  glutIdleFunc(NULL);
-  if(Manager.IsStep())
-    Manager.SetStopped(true);
-  else{
-    Manager.SetStopped(false);
-    glutTimerFunc(TimerDelay, TimerCallback, 0);
-  }
+    // set up time for next timestep if in continuous mode
+    glutIdleFunc(NULL);
+    if(Manager.IsStep())
+        Manager.SetStopped(true);
+    else{
+        Manager.SetStopped(false);
+        glutTimerFunc(TimerDelay, TimerCallback, 0);
+    }
 
 }
 
@@ -286,10 +277,9 @@ void LoadParameters(char *filename){
         fprintf(stderr, "error opening parameter file %s\n", filename);
         exit(1);
     }
-    cout << filename << endl;
 
-    //ParamFilename = filename;
-    cout << " skaksdfasf "<< endl;
+    ParamFilename = filename;
+
     if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
     &TimeStep, &DispTime, &numofparticles,
     &bspeed, &speedstd,
@@ -300,21 +290,13 @@ void LoadParameters(char *filename){
     &(env.Wind.x), &(env.Wind.y), &(env.Wind.z),
     &(env.G.x), &(env.G.y), &(env.G.z),
     &env.Viscosity) != 24){
-    cout << "ERROR" << endl;
         fprintf(stderr, "error reading parameter file %s\n", filename);
         fclose(paramfile);
         exit(1);
     }
 
-    //Generator.SetBaseAttr(0, bspeed, speedstd, bmass, bstd, bcolor, colstd, numofparticles);
-
-    //Sp.InitState(bvelocity, bcenter, bmass, bradius, coeffr, coefff, beps, viscosity, wind, gravity);
-    //[0].InitState(plane1, plcen1, peps1);
-    //Cube[1].InitState(plane2, plcen2, peps2);
-    //Cube[2].InitState(plane3, plcen3, peps3);
-    //Cube[3].InitState(plane4, plcen4, peps4);
-    //Cube[4].InitState(plane5, plcen5, peps5);
-    //Cube[5].InitState(plane6, plcen6, peps6);
+    Generator.SetBaseAttr(0, bspeed, speedstd, bmass, bstd, bcolor, colstd, numofparticles, coefff, coeffr);
+    Generator.SetCenterRadius(bcenter, 0);
 
     TimeStepsPerDisplay = Max(1, int(DispTime / TimeStep + 0.5));
     TimerDelay = int(0.5 * TimeStep * 1000);
@@ -326,9 +308,6 @@ void LoadParameters(char *filename){
 void RestartSim(){
 
   LoadParameters(ParamFilename); // reload parameters in case changed
-
-  Sp.Start(true);
-  Sp.Stopped(true);
 
   NTimeSteps = -1;
   glutIdleFunc(NULL);
@@ -344,14 +323,15 @@ void RestartSim(){
 //
 void InitSimulation(int argc, char* argv[]){
 
-cout << "argc: " << argc << endl;
   if(argc != 2){
-  cout << "really?" << endl;
     fprintf(stderr, "usage: particles paramfile\n");
     exit(1);
   }
 
   LoadParameters(argv[1]);
+
+  Sp.BuildSphere(20,1,0,20,0);
+  Cyl.BuildCylinder(5, 100);
 
   NSteps = 0;
   NTimeSteps = -1;
@@ -384,7 +364,7 @@ void InitCamera() {
 //
 void drawDisplay(){
   // distant light source, parallel rays coming from front upper right
-  const float light_position1[] = {0, -.5, 1, 0};
+  const float light_position1[] = {0, 1, 0, 0};
 
   // clear the window to the background color
   glClear(GL_COLOR_BUFFER_BIT);

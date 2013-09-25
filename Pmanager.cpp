@@ -33,24 +33,34 @@ int Pmanager::HasFreeParticles() {
     return MAXPART-nused;
 }
 
-void Pmanager::KillParticles(double ts) {
+int Pmanager::KillParticles(double ts) {
     int i;
+    int cnt = 0;
 
     for (i = 0; i < nused; i++) {
-        if(Particles[i].GetAge(ts) > 10) {
+        if(Particles[i].GetAge(ts) > 25) {
             FreeParticle(i);
+            cnt++;
         }
     }
+    //cout << "cnt of those killed: "<< cnt << endl;
+    return cnt;
 }
 
-void Pmanager::UseParticle(Vector3d c0, Vector3d v0, int ts, Vector4d color, double m) {
+void Pmanager::UseParticle(Vector3d c0, Vector3d v0, double ts, Vector4d color, double m, double coefff, double coeffr) {
 
 	Particles[nused].SetInUse(true);
 	Particles[nused].SetC0(c0);
+	Particles[nused].SetCenter(c0);
 	Particles[nused].SetV0(v0);
+    Particles[nused].SetVelocity(v0);
     Particles[nused].SetBirth(ts);
 	Particles[nused].SetColor(color);
 	Particles[nused].SetMass(m);
+	Particles[nused].SetCoefff(coefff);
+	Particles[nused].SetCoeffr(coeffr);
+
+	//Particles[nused].PrintAttr();
 
 	nused++;
 }

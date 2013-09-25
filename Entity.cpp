@@ -112,7 +112,7 @@ float Entity::PlaneBallColl(Vector3d bCenter, Vector3d bVelocity, Vector3d bNewC
 // should be called by collidable objects
 // uh...returns the index of the triangle that's closeset
 // pass in as &fhit
-int Entity::CheckCollision(Vector3d pcen, Vector3d pvel, Vector3d pnewcen, double *fhit) {
+int Entity::CheckCollision(Vector3d pcen, Vector3d pvel, Vector3d pnewcen, double *fhit, Vector3d *hitcenter) {
   int i, rtni;
   float f;
   double u, v, a;
@@ -130,12 +130,14 @@ int Entity::CheckCollision(Vector3d pcen, Vector3d pvel, Vector3d pnewcen, doubl
     u = ((p2 - p1) % (pcen - p1)) * normals[i] / a;
     v = ((p0 - p2) % (pcen - p2)) * normals[i] / a;
 
-    if(u >= 0 && v >= 0 && u + v <= 1) { // we hit...so now to calculate...
+    if(u >= 0 && v >= 0 && u + v <= 1 && u + v > 0) { // we hit...so now to calculate...
       f = ((pcen - p1) * normals[i] / ((pcen - pnewcen) * normals[i]));
 
       if(f >= 0 && f < 1 && f < *fhit) {
         *fhit = f;
         rtni = i;
+        //
+        hitcenter->set(p2 + u * (p0 - p2) + v * (p1 - p2));
       }
     }
   }

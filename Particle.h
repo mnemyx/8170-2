@@ -28,7 +28,7 @@ class Particle {
 		Vector3d Center;				// (current) position
 
 		Vector3d Acceleration;			// acceleration...
-		int Birth;						// store NTimeSteps of when the particle is "born" (for age)
+		double Birth;						// store NTimeSteps of when the particle is "born" (for age)
 		Vector4d Color;					// color
 		double Mass;					// particle's mass
 		double Coefff;					// coefficient of friction for particle
@@ -50,7 +50,7 @@ class Particle {
 		void CalcAccel(Vector3d g, Vector3d w, double v);   // calculate acceleration - need to consider how to handle accel ops
 		void CalcTempCV(double ts);     // calculate temp velocity & center;
 		void CalcTempCV(double ts, double f);   // calculate temp velocity & center;
-		void Reflect(Vector3d pnormal, Vector3d pvertex, double fhit);    // reflect the particle given the triangle's normal and vertex index
+		void Reflect(Vector3d pnormal, Vector3d pvertex, double fhit, Vector3d temphit);    // reflect the particle given the triangle's normal and vertex index
 
 		//////////// SETTERS //////////////
 		void SetV0(Vector3d v);
@@ -58,7 +58,7 @@ class Particle {
 		void SetC0(Vector3d c);
 		void SetCenter(Vector3d c);
 		void SetAcceleration(Vector3d a);
-		void SetBirth(int timestep);
+		void SetBirth(double timestep);
 		void SetColor(Vector4d color);
 		void SetMass(double m);
 		void SetInUse(int type);
@@ -73,14 +73,17 @@ class Particle {
 		Vector3d GetC0();
 		Vector3d GetCenter();
 		Vector3d GetAcceleration();
-		int GetAge(int currentTimestep);
+		double GetAge(double currentTimestep);
 		double GetMass();
 		int IsInUse();
 		double GetCoefff();
 		double GetCoeffr();
 		Vector3d GetTempc();
 		Vector3d GetTempv();
+        double GetBirth();
 
+        //////////// DEBUGGING ///////////////
+        void PrintAttr();
 };
 
 #endif

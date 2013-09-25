@@ -37,6 +37,8 @@ class Pgenerator {
 		double MStdDev;
 		Vector4d BaseColor;
 		double CStdDev;
+		double BaseCoefff;
+		double BaseCoeffr;
 
 		// because I'm too lazy to create a struct? is the overhead going to be that bad?
 		Vector3d GeneratedV0;
@@ -50,7 +52,7 @@ class Pgenerator {
 		Pgenerator();
 
 		// setters
-		void SetBaseAttr(int type, double bs, double sd, double bm, double msd, Vector4d bc, double csd, double pnum);
+		void SetBaseAttr(int type, double bs, double sd, double bm, double msd, Vector4d bc, double csd, double pnum, double coefff, double coeffr);
 		void SetCenterRadius(Vector3d center, double radius);
 		void SetModel(int orientation = 2);
 		void SetBaseColor(Vector4d newbc);
@@ -64,6 +66,8 @@ class Pgenerator {
 		Vector4d GenCol();
 		double GenMass();
 		int GetPNum();
+		double GetCoefff();
+		double GetCoeffr();
 
 };
 
