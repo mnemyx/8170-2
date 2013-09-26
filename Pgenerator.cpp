@@ -33,6 +33,10 @@ void Pgenerator::SetCenterRadius(Vector3d center, double radius) {
 	Radius = radius;
 }
 
+void Pgenerator::SetVelocity(Vector3d v) {
+    Velocity = v;
+}
+
 void Pgenerator::SetModel(int orientation) {
 	switch (Type) {
 		case CIRCLE: Shape.BuildCircle(Radius, orientation, Center.x, Center.y, Center.z); break;
@@ -99,6 +103,28 @@ Vector4d Pgenerator::GenerateColor(Vector4d c) {
     Vector4d newc;
     newc.set(gauss(c.x, CStdDev, 0), gauss(c.y, CStdDev, 0), gauss(c.z, CStdDev, 0), 1);
     return newc;
+}
+
+void Pgenerator::MoveGenerator(double ts) {
+    Vector3d tempc;
+
+    tempc = Center + ts * Velocity;
+
+    if(tempc.x > 60)
+        Velocity.set(Velocity.x * -1, Velocity.y, Velocity.z);
+    if(tempc.x < -60)
+        Velocity.set(Velocity.x * -1, Velocity.y, Velocity.z);
+    if(tempc.y > 60)
+        Velocity.set(Velocity.x, Velocity.y * -1, Velocity.z);
+    if(tempc.y < -60)
+        Velocity.set(Velocity.x, Velocity.y * -1, Velocity.z);
+    if(tempc.z > 60)
+        Velocity.set(Velocity.x, Velocity.y * -1, Velocity.z);
+    if(tempc.z < -60)
+        Velocity.set(Velocity.x, Velocity.y * -1, Velocity.z);
+
+    Center = Center + ts * Velocity;
+
 }
 
 // generate random velocity, center, color, mass

@@ -58,27 +58,13 @@ void Particle::CalcAccel(Vector3d g, Vector3d w, double v) {
     Acceleration = g + v * (w - Velocity) / Mass;
 }
 
-void Particle::CalcAttractAccel(double length, double radius, Vector3d p0, Vector3d p1, Vector3d g) {
-    Vector3d a, unit, b, u;
-    double l, d, f;
+void Particle::CalcAttractAccel(Vector3d p0, Vector3d g) {
+    Vector3d u, d;
 
-    unit = (p1 - p0).normalize();
+    u = (Center - p0).normalize();
+    d = (Center - p0).norm();
 
-    a = Center - p0;
-    l = (unit * a);
-    b = a - l * unit;
-
-    u = b.normalize();
-    d = b.norm();
-
-    f = l / length;
-
-    if (0 < f && f < 1 && d < radius) {
-        Acceleration = Acceleration + (- g * (Mass / (d * d)) * u);
-        //cout << "Acceleration Modified: ";
-        //Acceleration.print();
-        //cout << endl;
-    }
+    Acceleration = Acceleration + ((- g * ( Mass / (d * d)) * u) / Mass);
 }
 
 
@@ -101,7 +87,7 @@ void Particle::CalcTempCV(double ts, double f) {
 void Particle::Reflect(Vector3d pnormal, Vector3d pvertex) {
     Vector3d vn;
     Vector3d smallr;
-    smallr.set(.00001, .00001, .00001);
+    smallr.set(.5, .5, .5);
     double d;
 
     if (tempv * pnormal == 0) vn.set(0,0,0);
@@ -110,15 +96,11 @@ void Particle::Reflect(Vector3d pnormal, Vector3d pvertex) {
     //if (Velocity * pnormal == 0) vt = Velocity;
     //else vt = Velocity - (Velocity * pnormal) * pnormal;
 
-    //Center.print();
-    //cout << endl << "before ^ & after v" << endl;
     //Center = (fhit * Velocity) + smallr;  // need the center before we flip the velocity.
     Velocity = tempv - ((1 + Coeffr) * (vn));// - ((1 - Coefff) * vt);bary
-    d = (tempc - pvertex) * vn + .0001;
-    Center = tempc - d * vn;
 
-    //Center.print();
-    //cout << endl;
+    d = (tempc - pvertex) * pnormal + .00001;
+    Center = tempc - d * pnormal + smallr ;
 
 }
 

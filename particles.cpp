@@ -105,12 +105,19 @@ static double Time = 0;
 Pmanager Manager;
 Pgenerator Generator;
 Entity Sp;
+Vector3d Pa1;
 
 struct Env {
     Vector3d G;
     Vector3d Wind;
     double Viscosity;
  } env;
+
+struct Attractor {
+    Vector3d g;
+    Vector3d center;
+    double r;
+} pa1, pa2;
 
 /************** DRAWING & SHADING FUNCTIONS ***********************/
 //
@@ -170,7 +177,7 @@ void DrawScene(int collision, int cubeIndx){
   glClear(GL_COLOR_BUFFER_BIT);
   glClear(GL_DEPTH_BUFFER_BIT);
 
-  DrawNonMovingObj();
+  //DrawNonMovingObj();
   DrawMovingObj();
 
   glutSwapBuffers();
@@ -183,6 +190,7 @@ void DrawScene(int collision, int cubeIndx){
 //
 void Simulate(){
     int i, j, p, phit, freep, ahit;
+    float f, fhit;
     Vector3d temphit, p0, p1, g;
 
     // don't do anything if our simulation is stopped
@@ -193,6 +201,8 @@ void Simulate(){
     // for now, kill off particles whose age > 20
     int killed = Manager.KillParticles(Time);
 
+    Generator.MoveGenerator(TimeStep);
+
     // for every particle the manager has....
     for (j = 0; j < Manager.GetNused(); j++ ) {
 
@@ -200,6 +210,10 @@ void Simulate(){
         Manager.Particles[j].CalcAccel(env.G, env.Wind, env.Viscosity);
 
         //check if we hit within the attractor's grasp
+        if((Manager.Particles[j].GetCenter() - pa1.center).norm() < pa1.r)
+            Manager.Particles[j].CalcAttractAccel(pa1.center, pa1.g);
+        if((Manager.Particles[j].GetCenter() - pa2.center).norm() < pa2.r)
+            Manager.Particles[j].CalcAttractAccel(pa2.center, pa2.g);
 
 
         // evil Euler integration to get velocity and position at next timestep
@@ -210,6 +224,7 @@ void Simulate(){
             Manager.Particles[j].SetColor(Generator.GenerateColor(Manager.Particles[j].GetColor()));
 
         phit = -1;
+
         phit = Sp.CheckCollision(Manager.Particles[j].GetCenter(), Manager.Particles[j].GetTempv(), Manager.Particles[j].GetTempc());
 
 
@@ -271,7 +286,7 @@ void LoadParameters(char *filename){
     FILE *paramfile;
 
     double numofparticles, bspeed, speedstd, bmass, bstd, colstd, coeffr, coefff;
-    Vector3d  bcenter;
+    Vector3d  bcenter, bvelocity;
     Vector4d bcolor;
 
     if((paramfile = fopen(filename, "r")) == NULL){
@@ -281,16 +296,17 @@ void LoadParameters(char *filename){
 
     ParamFilename = filename;
 
-    if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+    if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
     &TimeStep, &DispTime, &numofparticles,
     &bspeed, &speedstd,
     &bmass, &bstd,
     &(bcolor.x), &(bcolor.y), &(bcolor.z), &(bcolor.w), &colstd,
     &coeffr, &coefff,
     &(bcenter.x), &(bcenter.y), &(bcenter.z),
+    &(bvelocity.x), &(bvelocity.y), &(bvelocity.z),
     &(env.Wind.x), &(env.Wind.y), &(env.Wind.z),
     &(env.G.x), &(env.G.y), &(env.G.z),
-    &env.Viscosity) != 24){
+    &env.Viscosity) != 27){
         fprintf(stderr, "error reading parameter file %s\n", filename);
         fclose(paramfile);
         exit(1);
@@ -298,6 +314,7 @@ void LoadParameters(char *filename){
 
     Generator.SetBaseAttr(0, bspeed, speedstd, bmass, bstd, bcolor, colstd, numofparticles, coefff, coeffr);
     Generator.SetCenterRadius(bcenter, 0);
+    Generator.SetVelocity(bvelocity);
 
     TimeStepsPerDisplay = Max(1, int(DispTime / TimeStep + 0.5));
     TimerDelay = int(0.5 * TimeStep * 1000);
@@ -331,7 +348,15 @@ void InitSimulation(int argc, char* argv[]){
 
   LoadParameters(argv[1]);
 
-  Sp.BuildSphere(20,1,0,0,0);
+  Sp.BuildSphere(4,1,0,39,0);
+
+  pa1.center.set(10, 40, 5);
+  pa1.g.set(200, 200, 200);
+  pa1.r = 40;
+
+  pa2.center.set(-10, 40, -5);
+  pa2.g.set(200, 200, 200);
+  pa2.r = 40;
 
   NSteps = 0;
   NTimeSteps = -1;

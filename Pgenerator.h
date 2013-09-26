@@ -26,7 +26,7 @@ class Pgenerator {
 		Model Shape;
 
 		Vector3d Center;
-		//Vector3d Velocity;		// could be moving...but uh, for now, let's not move it.
+		Vector3d Velocity;		// could be moving...but uh, for now, let's not move it.
 
 		double Radius;              // if it's a sphere?
 
@@ -54,12 +54,14 @@ class Pgenerator {
 		// setters
 		void SetBaseAttr(int type, double bs, double sd, double bm, double msd, Vector4d bc, double csd, double pnum, double coefff, double coeffr);
 		void SetCenterRadius(Vector3d center, double radius);
+		void SetVelocity(Vector3d v);
 		void SetModel(int orientation = 2);
 		void SetBaseColor(Vector4d newbc);
 
 		// generate random velocity, center, color, mass
 		void GenerateAttr();
 		Vector4d GenerateColor(Vector4d c);
+		void MoveGenerator(double timestep);
 
 		// technically getters
 		Vector3d GenV0();

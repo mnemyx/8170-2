@@ -118,8 +118,8 @@ int Entity::CheckCollision(Vector3d pcen, Vector3d pvel, Vector3d pnewcen) {
   double u, v, a;
   Vector3d p0, p1, p2;
 
-  fhit = 100;
   rtni = -1;
+  fhit = 100;
 
   for (i = 0; i < ntriangles; i++) {
     p0.set(vertices[triangles[i][0]]);
@@ -131,7 +131,7 @@ int Entity::CheckCollision(Vector3d pcen, Vector3d pvel, Vector3d pnewcen) {
     u = ((p2 - p1) % (pcen - p1)) * normals[i] / a;
     v = ((p0 - p2) % (pcen - p2)) * normals[i] / a;
 
-    if(u >= 0 && v >= 0 && u + v <= 1 && u + v > 0) { // we hit...so now to calculate...
+    if(u >= 0.001 && v >= 0.001 && u + v <= 1 && u + v > -0.001) { // we hit...so now to calculate...
       f = ((pcen - p1) * normals[i] / ((pcen - pnewcen) * normals[i]));
 
       if(f >= 0 && f < 1 && f < fhit) {
