@@ -25,9 +25,7 @@ using namespace std;
 #define MAXSTEPS	10000
 
 #define MenuContinuous	1	// menu; switch from continues to step
-#define MenuReset	2		// resets the ball
-#define MenuClean	3		// cleans history of ball & resets it
-#define MenuQuit	4		// quits program
+#define MenuQuit	2		// quits program
 
 #define NEAR		10		// distance of near clipping plane
 #define FAR		1000		// distance of far clipping plane
@@ -224,7 +222,6 @@ void Simulate(){
             Manager.Particles[j].SetColor(Generator.GenerateColor(Manager.Particles[j].GetColor()));
 
         phit = -1;
-
         phit = Sp.CheckCollision(Manager.Particles[j].GetCenter(), Manager.Particles[j].GetTempv(), Manager.Particles[j].GetTempc());
 
 
@@ -348,15 +345,15 @@ void InitSimulation(int argc, char* argv[]){
 
   LoadParameters(argv[1]);
 
-  Sp.BuildSphere(4,1,0,39,0);
+  Sp.BuildSphere(10,1,0,0,0);
 
-  pa1.center.set(10, 40, 5);
+  pa1.center.set(-40, 0, -5);
   pa1.g.set(200, 200, 200);
-  pa1.r = 40;
+  pa1.r = 60;
 
-  pa2.center.set(-10, 40, -5);
+  pa2.center.set(40, 30, -5);
   pa2.g.set(200, 200, 200);
-  pa2.r = 40;
+  pa2.r = 60;
 
   NSteps = 0;
   NTimeSteps = -1;
@@ -571,15 +568,6 @@ void HandleMenu(int index){
     }
     break;
 
-  case MenuReset:
-    RestartSim();
-    break;
-
-  case MenuClean:
-    NSteps = 0;
-    RestartSim();
-    break;
-
   case MenuQuit:
     exit(0);
   }
@@ -592,8 +580,6 @@ void MakeMenu(){
   int id = glutCreateMenu(HandleMenu);
 
   glutAddMenuEntry("Step", MenuContinuous);
-  glutAddMenuEntry("Reset", MenuReset);
-  glutAddMenuEntry("Clean", MenuClean);
   glutAddMenuEntry("Quit", MenuQuit);
 
   glutSetMenu(id);
@@ -624,8 +610,15 @@ void handleKey(unsigned char key, int x, int y){
       if(MenuAttached) { MakeMenu(); }
       else glutDetachMenu(GLUT_RIGHT_BUTTON);
       break;
+
+    case 'r':
+    case 'R':
+        Manager.KillAll();
+        RestartSim();
+      break;
     default:		// not a valid key -- just ignore it
       return;
+
   }
 
   glutPostRedisplay();

@@ -10,7 +10,7 @@
 #ifndef _PMANAGER_H_
 #define _PMANAGER_H_
 
-#define MAXPART		5000
+#define MAXPART		8000
 
 #include "Particle.h"
 
@@ -38,6 +38,7 @@ class Pmanager {
 		int HasFreeParticles();
 
         // kill off particles..
+        void KillAll();
         int KillParticles(double timestep);
 
 		// assigns particle an initial velocity and center...

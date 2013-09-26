@@ -33,12 +33,26 @@ int Pmanager::HasFreeParticles() {
     return MAXPART-nused;
 }
 
+void Pmanager::KillAll() {
+    int i;
+        for (i = 0; i < nused; i++)
+            Particles[i].Reset();
+    nused = 0;
+}
+
 int Pmanager::KillParticles(double ts) {
     int i;
     int cnt = 0;
+    Vector3d center;
 
     for (i = 0; i < nused; i++) {
-        if(Particles[i].GetAge(ts) > 25) {
+        center = Particles[i].GetCenter();
+
+        if(Particles[i].GetAge(ts) > 15
+            || center.x > 80 || center.x < -80
+            || center.y > 80 || center.y < -80
+            || center.z > 80 || center.z < -80)
+        {
             FreeParticle(i);
             cnt++;
         }

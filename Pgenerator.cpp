@@ -116,12 +116,12 @@ void Pgenerator::MoveGenerator(double ts) {
         Velocity.set(Velocity.x * -1, Velocity.y, Velocity.z);
     if(tempc.y > 60)
         Velocity.set(Velocity.x, Velocity.y * -1, Velocity.z);
-    if(tempc.y < -60)
+    if(tempc.y < 0)
         Velocity.set(Velocity.x, Velocity.y * -1, Velocity.z);
     if(tempc.z > 60)
-        Velocity.set(Velocity.x, Velocity.y * -1, Velocity.z);
+        Velocity.set(Velocity.x, Velocity.y, Velocity.z * -1);
     if(tempc.z < -60)
-        Velocity.set(Velocity.x, Velocity.y * -1, Velocity.z);
+        Velocity.set(Velocity.x, Velocity.y, Velocity.z * -1);
 
     Center = Center + ts * Velocity;
 
