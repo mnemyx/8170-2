@@ -1,8 +1,8 @@
 /***************************************************
   State.h
-  
+
   Header file for State Class
-  
+
   CPSC8170 - Proj 1   GBG   8/2013
 ****************************************************/
 
@@ -22,43 +22,43 @@
 #define MAXSTEPS	10000
 
 
-  
+
 class State{
   private:
-    
+
     Vector3d Velocity;		// object's velocity
     Vector3d V0;			// object's initial velocity
     Vector3d Acceleration;	// object's acceleration
-    
+
     Vector3d Center;		// for particles...really. i should consider changing these...
 	Vector3d C0;
     double Mass;			// for particles...really. i should consider changing these...
     float Radius;			// for particles...really. i should consider changing these...
-    
+
     int Start;				// is the object started
     int Stopped;			// is the object stopped
     int Step;				// is...stepping?
     int Resting;			// is the object resting...
     int Trace;				// i'll probably keep this - trace the object's path
-    
+
     double CoeffofRestitution;		// the object's coefficient of restitution
     double CoeffofFriction;			// the object's coefficient of friction
     float EPS;					// the "fudge factor"
-	
+
 	Vector3d Wind;			// the wind vector
     Vector3d G;				// gravity vector...
     double Viscosity;		// viscosity
-    
+
     int Collision[MAXSTEPS];		// keeping track of the collisions
     Vector3d OldCenter[MAXSTEPS];	// keeping track of the object's old centers (for collision sake & tracing)
 	Vector3d CollidedN;				// normal that was collided with...need to clean this up...
 	double T;						// distance from the hit..
 
-    
+
   public:
     // Constructor
     State();
-    
+
     // Setters
     void SetVelocity(Vector3d v);
     void SetVX(float x);
@@ -92,7 +92,7 @@ class State{
 	void SetGravity(Vector3d g);
 	void SetWind(Vector3d w);
 	void SetViscosity(double viscosity);
-    
+
     // Getters
     Vector3d GetVelocity();
     Vector3d GetInitialVelocity();
@@ -116,7 +116,7 @@ class State{
 	Vector3d GetCollidedN();
 	Vector3d GetOldCenter(int indx = 0);
 	double GetT();
-   
+
    // Functions  ||  Rule of thumb: if the calculations relies *mostly* on state variables, place in state.  If it relies 2 entities; then...should probably NOT put it here.
    void CalcAcceleration();
    Vector3d CalcNewVelocity(double timestep);

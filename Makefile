@@ -19,8 +19,8 @@ else
   endif
 endif
 
-HFILES 	= Matrix.${H} Vector.${H} Utility.${H} Model.${H} State.${H} Entity.${H} gauss.${H} Particle.${H} Pmanager.${H} Pgenerator.${H}
-OFILES 	= Matrix.o Vector.o Utility.o Model.o  State.o Entity.o gauss.o Particle.o Pmanager.o Pgenerator.o
+HFILES 	= Matrix.${H} Vector.${H} Utility.${H} Model.${H} Attributes.${H} Entity.${H} gauss.${H} Particle.${H} Pmanager.${H} Pgenerator.${H}
+OFILES 	= Matrix.o Vector.o Utility.o Model.o  Attributes.o Entity.o gauss.o Particle.o Pmanager.o Pgenerator.o
 PROJECT = particles
 
 ${PROJECT}:	${PROJECT}.o $(OFILES)
@@ -28,7 +28,7 @@ ${PROJECT}:	${PROJECT}.o $(OFILES)
 
 ${PROJECT}.o: ${PROJECT}.${C} $(HFILES)
 	${CC} $(CFLAGS) -c ${PROJECT}.${C}
-	
+
 Pgenerator.o: Pgenerator.${C} Pgenerator.${H}
 	${CC} ${CFLAGS} -c ${INCFLAGS} Pgenerator.${C}
 
@@ -44,16 +44,16 @@ gauss.o: gauss.${C} gauss.${H}
 Entity.o: Entity.${C} Entity.${H}
 	${CC} ${CFLAGS} -c ${INCFLAGS} Entity.${C}
 
-State.o: State.${C} State.${H}
-	${CC} ${CFLAGS} -c ${INCFLAGS} State.${C}
+Attributes.o: Attributes.${C} Attributes.${H}
+	${CC} ${CFLAGS} -c ${INCFLAGS} Attributes.${C}
 
 Model.o: Model.${C} Model.${H}
 	${CC} ${CFLAGS} -c ${INCFLAGS} Model.${C}
 
-Matrix.o: Matrix.${C} Matrix.${H} Vector.${H} Utility.${H} 
+Matrix.o: Matrix.${C} Matrix.${H} Vector.${H} Utility.${H}
 	${CC} $(CFLAGS) -c Matrix.${C}
 
-Vector.o: Vector.${C} Vector.${H} Utility.${H} 
+Vector.o: Vector.${C} Vector.${H} Utility.${H}
 	${CC} $(CFLAGS) -c Vector.${C}
 
 Utility.o: Utility.${C} Utility.${H}
