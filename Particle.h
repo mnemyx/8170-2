@@ -16,7 +16,7 @@
 #  include <GL/glut.h>
 #endif
 
-#define MAXHIST		10000
+#define MAXHIST		25
 
 #include "Vector.h"
 
@@ -28,7 +28,7 @@ class Particle {
 		Vector3d Center;				// (current) position
 
 		Vector3d Acceleration;			// acceleration...
-		double Birth;						// store NTimeSteps of when the particle is "born" (for age)
+		double Birth;					// store NTimeSteps of when the particle is "born" (for age)
 		Vector4d Color;					// color
 		double Mass;					// particle's mass
 		double Coefff;					// coefficient of friction for particle
@@ -42,6 +42,8 @@ class Particle {
 		Vector3d tempc;                 // temporary center
 
 		void AddHistory(Vector3d c);	// gets called by SetCenter()...
+
+		int Blend;                      // draw in blend mode toggle
 
 	public:
 		void Reset();					// gets called by the constructor. kind of cleans up..

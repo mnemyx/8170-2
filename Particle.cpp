@@ -17,13 +17,17 @@ using namespace std;
 
 ///////////////////// PRIVATE FUNCTIONS ///////////////////
 void Particle::AddHistory(Vector3d c) {
-	if(nhistory == MAXHIST){
-		cerr << "Number of entries in particle history exceeds maximum of " << MAXHIST << endl;
-		exit(1);
-	}
+    int i;
 
-	History[nhistory] = c;
-	nhistory++;
+	if(nhistory == MAXHIST){
+		for (i = 0; i < nhistory - 1; i++) {
+            History[i] = History[i+1];
+		}
+		History[nhistory - 1] = c;
+	} else {
+        History[nhistory] = c;
+        nhistory++;
+	}
 }
 
 //////////////////// PUBLIC FUNCTIONS /////////////////////
