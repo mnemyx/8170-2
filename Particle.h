@@ -42,6 +42,7 @@ class Particle {
 		//////////// SETTERS //////////////
 		void SetBirth(double timestep);
 		void SetInUse(int type);
+		void SetBlend(int blend);
 
 		//////////// GETTERS ///////////////
         double GetBirth();

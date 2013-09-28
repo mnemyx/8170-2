@@ -24,16 +24,28 @@ Particle::Particle(){
 }
 
 void Particle::Draw() {
+    int i;
     glDisable(GL_LIGHTING);
     glEnable(GL_SMOOTH);
     glEnable(GL_BLEND);
 
-    glColor4f(Color.x, Color.y, Color.z, Color.w);
+    if(!Blend) {
+        glBegin(GL_POINTS);
+            glColor4f(A.GetColor().x, A.GetColor().y, A.GetColor().z, A.GetColor().w);
+            glVertex3f(A.GetCenter().x, A.GetCenter().y, A.GetCenter().z);
+        glEnd();
+    } else {
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glColor4f(A.GetColor().x, A.GetColor().y, A.GetColor().z, A.GetColor().w);
 
-	glBegin(GL_POINTS);
-		glVertex3f(Center.x, Center.y, Center.z);
-	glEnd();
-
+        glBegin(GL_LINE_POINTS);
+            glVertex3f(A.GetCenter().x, A.GetCenter().y, A.GetCenter().z);
+            for (i = nhistory - 1; i >= 0; i++) {
+                glColor4f(A.GetColor().x, A.GetColor().y, A.GetColor().z, (i/(nhistory-1)));
+                glVertex3f(History[i].x, History[i].y, History[i].z);
+            }
+        glEnd();
+    }
 	glDisable(GL_BLEND);
 	glDisable(GL_SMOOTH);
 	glEnable(GL_LIGHTING);
@@ -57,7 +69,7 @@ void Particle::AddHistory(Vector3d c) {
 //////////// SETTERS //////////////
 void Particle::SetBirth(double timestep) { Birth = timestep; }
 void Particle::SetInUse(int type) { InUse = type; }
-
+void Particle::SetBlend(int blend) { Blend = blend; }
 
 //////////// GETTERS ///////////////
 double Particle::GetBirth() { return Birth; }

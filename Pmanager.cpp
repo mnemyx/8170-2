@@ -61,20 +61,21 @@ int Pmanager::KillParticles(double ts) {
     return cnt;
 }
 
-void Pmanager::UseParticle(Vector3d c0, Vector3d v0, double ts, Vector4d color, double m, double coefff, double coeffr) {
+void Pmanager::UseParticle(Vector3d c0, Vector3d v0, double ts, Vector4d color, double m, double coefff, double coeffr, int blend) {
 
 	Particles[nused].SetInUse(true);
-	Particles[nused].SetC0(c0);
-	Particles[nused].SetCenter(c0);
-	Particles[nused].SetV0(v0);
-    Particles[nused].SetVelocity(v0);
+	Particles[nused].A.SetC0(c0);
+	Particles[nused].A.SetCenter(c0);
+	Particles[nused].A.SetV0(v0);
+    Particles[nused].A.SetVelocity(v0);
     Particles[nused].SetBirth(ts);
-	Particles[nused].SetColor(color);
-	Particles[nused].SetMass(m);
-	Particles[nused].SetCoefff(coefff);
-	Particles[nused].SetCoeffr(coeffr);
+	Particles[nused].A.SetColor(color);
+	Particles[nused].A.SetMass(m);
+	Particles[nused].A.SetCoefff(coefff);
+	Particles[nused].A.SetCoeffr(coeffr);
+	Particles[nused].SetBlend(blend);
 
-	//Particles[nused].PrintAttr();
+	//Particles[nused].A.PrintAttr();
 
 	nused++;
 }
