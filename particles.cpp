@@ -101,11 +101,11 @@ static int NTimeSteps = -1;
 static double Time = 0;
 
 Pmanager Manager;
-Pgenerator Generator;
+Pgenerator Generator1, Generator2;
 Entity Sp;
+Entity Pl;
 
 static int AllowBlend = true;
-static double BlendSize;
 
 struct Env {
     Vector3d G;
@@ -117,7 +117,7 @@ struct Attractor {
     Vector3d g;
     Vector3d center;
     double r;
-} pa1, pa2;
+} pa1, pa2, pa3, pa4;
 
 /************** DRAWING & SHADING FUNCTIONS ***********************/
 //
@@ -161,14 +161,19 @@ void DrawNonMovingObj() {
   glEnable(GL_BLEND);
   glDepthMask(GL_TRUE);
 
-  GetShading(0);
+  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_DEPTH_BUFFER_BIT);
+
+  GetShading(1);
   Sp.Draw(BRIGHT_PALEBLUE);
+
+  glutSwapBuffers();
 }
 
 //
 //  Draw the ball, its traces and the floor if needed
 //
-void DrawScene(int collision, int cubeIndx){
+void DrawScene(int collision){
 
   int i,j;
   Model p;
@@ -188,7 +193,7 @@ void DrawScene(int collision, int cubeIndx){
 //  Run a single time step in the simulation
 //
 void Simulate(){
-    int i, j, p, phit, freep, ahit;
+    int i, j, p, phit,ahit;
     float f, fhit;
     Vector3d temphit, p0, p1, g;
 
@@ -201,7 +206,8 @@ void Simulate(){
     int killed = Manager.KillParticles(Time);
 
     //cout << "killed: " << killed << endl;
-    Generator.MoveGenerator(TimeStep);
+    Generator1.MoveGenerator(TimeStep);
+    Generator2.MoveGenerator(TimeStep);
 
     // for every particle the manager has....
     for (j = 0; j < Manager.GetNused(); j++ ) {
@@ -216,29 +222,51 @@ void Simulate(){
             Manager.Particles[j].A.CalcPtAttract(pa1.center, pa1.g);
         if((Manager.Particles[j].A.GetCenter() - pa2.center).norm() < pa2.r)
             Manager.Particles[j].A.CalcPtAttract(pa2.center, pa2.g);
-
+        if((Manager.Particles[j].A.GetCenter() - pa3.center).norm() < pa3.r)
+            Manager.Particles[j].A.CalcPtAttract(pa3.center, pa3.g);
+        if((Manager.Particles[j].A.GetCenter() - pa4.center).norm() < pa4.r)
+            Manager.Particles[j].A.CalcPtAttract(pa4.center, pa4.g);
 
         // evil Euler integration to get velocity and position at next timestep
         Manager.Particles[j].A.CalcTempCV(TimeStep);
 
         // Manager.Particles[j].PrintAttr();
-        if((int)Manager.Particles[j].GetAge(Time) % 5 == 0)
-            Manager.Particles[j].A.SetColor(Generator.GenerateColor(Manager.Particles[j].A.GetColor()));
+        /**if((int)Manager.Particles[j].GetAge(Time) % 5 == 0)
+            Manager.Particles[j].A.SetColor(Generator1.GenerateColor(Manager.Particles[j].A.GetColor()));
+
+
+        if((Manager.Particles[j].A.GetTempc() - Sp.A.GetCenter()).norm() < Sp.GetRadius()) {
+            phit = -1;
+            phit = Sp.CheckCollision(Manager.Particles[j].A.GetCenter(), Manager.Particles[j].A.GetTempv(), Manager.Particles[j].A.GetTempc());
+
+            if(phit != -1) {
+                // reflect it from the plane -- data during collision
+                Manager.Particles[j].A.Reflect(Sp.GetNormal(phit), Sp.GetVertex(Sp.GetTriangle(phit).x));
+                //DrawScene(1, ihit);  // should do something with this in terms of collision; change draw scene function
+            } else {
+                Manager.Particles[j].A.SetVelocity(Manager.Particles[j].A.GetTempv());
+                Manager.Particles[j].A.SetCenter(Manager.Particles[j].A.GetTempc());
+            }
+
+        /**} else {
+            Manager.Particles[j].A.SetVelocity(Manager.Particles[j].A.GetTempv());
+            Manager.Particles[j].A.SetCenter(Manager.Particles[j].A.GetTempc());
+
+        }**/
 
         phit = -1;
-        phit = Sp.CheckCollision(Manager.Particles[j].A.GetCenter(), Manager.Particles[j].A.GetTempv(), Manager.Particles[j].A.GetTempc());
-
+        phit = Pl.CheckCollision(Manager.Particles[j].A.GetCenter(), Manager.Particles[j].A.GetTempv(), Manager.Particles[j].A.GetTempc());
 
         if(phit != -1) {
           // reflect it from the plane -- data during collision
-          Manager.Particles[j].A.Reflect(Sp.GetNormal(phit), Sp.GetVertex(Sp.GetTriangle(phit).x));
+          Manager.Particles[j].A.Reflect(Pl.GetNormal(phit), Pl.GetVertex(Pl.GetTriangle(phit).x));
 
           //DrawScene(1, ihit);  // should do something with this in terms of collision; change draw scene function
         } else {
             Manager.Particles[j].A.SetVelocity(Manager.Particles[j].A.GetTempv());
             Manager.Particles[j].A.SetCenter(Manager.Particles[j].A.GetTempc());
-
         }
+
 
         //cout << "Im adding inside the simulate for loop... " << endl;
         Manager.Particles[j].AddHistory(Manager.Particles[j].A.GetCenter());
@@ -247,10 +275,13 @@ void Simulate(){
 
     //cout << "ADDING!! " << endl;
     // generate particles if we can
-    if(freep = Manager.HasFreeParticles() > 0) {
-        for(i = 0; i < freep || i < Generator.GetPNum(); i++) {
-            Generator.GenerateAttr();
-            Manager.UseParticle(Generator.GenC0(), Generator.GenV0(), Time, Generator.GenC0(), Generator.GenMass(), Generator.GetCoefff(), Generator.GetCoeffr(), AllowBlend, (int)BlendSize);
+    if(Manager.HasFreeParticles()) {
+    //cout << "Manager.FreePLeft(): " << Manager.FreePLeft() << endl;
+        for(i = 0; i < Manager.FreePLeft() - 1 && i < Generator1.GetPNum() + Generator2.GetPNum(); i++) {
+            Generator1.GenerateAttr(1);
+            Manager.UseParticle(Generator1.GenC0(), Generator1.GenV0(), Time, Generator1.GenC0(), Generator1.GenMass(), Generator1.GetCoefff(), Generator1.GetCoeffr(), AllowBlend);
+            Generator2.GenerateAttr(0);
+            Manager.UseParticle(Generator2.GenC0(), Generator2.GenV0(), Time, Generator2.GenC0(), Generator2.GenMass(), Generator2.GetCoefff(), Generator2.GetCoeffr(), AllowBlend);
         }
     }
 
@@ -262,7 +293,7 @@ void Simulate(){
 
     // draw only if we are at a display time
     if(NTimeSteps % TimeStepsPerDisplay == 0)
-    DrawScene(0,0);
+    DrawScene(0);
 
     // set up time for next timestep if in continuous mode
     glutIdleFunc(NULL);
@@ -290,7 +321,7 @@ void LoadParameters(char *filename){
 
     FILE *paramfile;
 
-    double numofparticles, bspeed, speedstd, bmass, bstd, colstd, coeffr, coefff, genr, psize;
+    double numofparticles, bspeed, speedstd, bmass, bstd, colstd, coeffr, coefff, genr, psize, blendsize;
     Vector3d  bcenter, bvelocity;
     Vector4d bcolor;
 
@@ -301,8 +332,8 @@ void LoadParameters(char *filename){
 
     ParamFilename = filename;
 
-    if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
-    &TimeStep, &DispTime, &numofparticles, &psize, &BlendSize,
+    if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+    &TimeStep, &DispTime, &numofparticles, &psize,
     &bspeed, &speedstd,
     &bmass, &bstd,
     &(bcolor.x), &(bcolor.y), &(bcolor.z), &(bcolor.w), &colstd,
@@ -311,7 +342,7 @@ void LoadParameters(char *filename){
     &(bvelocity.x), &(bvelocity.y), &(bvelocity.z),
     &(env.Wind.x), &(env.Wind.y), &(env.Wind.z),
     &(env.G.x), &(env.G.y), &(env.G.z),
-    &env.Viscosity) != 30){
+    &env.Viscosity) != 29){
         fprintf(stderr, "error reading parameter file %s\n", filename);
         fclose(paramfile);
         exit(1);
@@ -319,10 +350,15 @@ void LoadParameters(char *filename){
 
     Manager.SetMaxPart((int)psize);
 
-    Generator.SetBaseAttr(2, bspeed, speedstd, bmass, bstd, bcolor, colstd, numofparticles, coefff, coeffr);
-    Generator.SetCenterRadius(bcenter, genr);
-    Generator.SetVelocity(bvelocity);
-    Generator.SetModel();
+    Generator1.SetBaseAttr(2, bspeed, speedstd, bmass, bstd, bcolor, colstd, numofparticles, coefff, coeffr);
+    Generator1.SetCenterRadius(bcenter, genr);
+    Generator1.SetVelocity(bvelocity);
+    Generator1.SetModel();
+
+    Generator2.SetBaseAttr(2, bspeed, speedstd, bmass, bstd, bcolor, colstd, numofparticles, coefff, coeffr);
+    Generator2.SetCenterRadius(bcenter, genr);
+    Generator2.SetVelocity(bvelocity);
+    Generator2.SetModel();
 
     TimeStepsPerDisplay = Max(1, int(DispTime / TimeStep + 0.5));
     TimerDelay = int(0.5 * TimeStep * 1000);
@@ -339,7 +375,7 @@ void RestartSim(){
   glutIdleFunc(NULL);
   Time = 0;
 
-  DrawScene(0, 0);
+  DrawScene(0);
 }
 
 
@@ -356,15 +392,26 @@ void InitSimulation(int argc, char* argv[]){
 
   LoadParameters(argv[1]);
 
-  Sp.BuildSphere(20,0,0,0);
+  Sp.BuildSphere(20,0,-10,0);
+  Sp.SetRadius(20);
 
-  pa1.center.set(-40, 0, -5);
-  pa1.g.set(200, 200, 200);
-  pa1.r = 60;
+  Pl.BuildPlane(Vector3d(-20, -10, 15), Vector3d(20, -10, 15), Vector3d(20, 10, -20), Vector3d(-10, 10, -20));
 
-  pa2.center.set(40, 30, -5);
-  pa2.g.set(200, 200, 200);
-  pa2.r = 60;
+  pa1.center.set(5, -20, 15);
+  pa1.g.set(5,5,5);
+  pa1.r = 25;
+
+  pa2.center.set(20, -10, 15);
+  pa2.g.set(50, 50, 50);
+  pa2.r = 25;
+
+  pa3.center.set(20, 10, -20);
+  pa3.g.set(-50,-50, -50);
+  pa3.r = 25;
+
+  pa3.center.set(-10, 10, -20);
+  pa3.g.set(-50, -50, -50);
+  pa3.r = 25;
 
   NSteps = 0;
   NTimeSteps = -1;
@@ -424,7 +471,7 @@ void drawDisplay(){
   glRotatef(ThetaY, 0, 1, 0);       // rotate model about x axis
   glRotatef(ThetaX, 1, 0, 0);       // rotate model about y axis
 
-  DrawScene(0, 0);
+  DrawScene(0);
 
   glutSwapBuffers();
 }
@@ -535,7 +582,7 @@ void handleButton(int button, int state, int x, int y){
         Manager.SetStarted(false);
         Manager.SetStopped(false);
         // need to re-initialize...should move to key press?
-        DrawScene(0,0);
+        DrawScene(0);
         glutIdleFunc(Simulate);
       }
       else if(Manager.IsStopped()){

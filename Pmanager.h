@@ -39,6 +39,7 @@ class Pmanager {
 
 		// determines if it has free particles
 		int HasFreeParticles();
+		int FreePLeft();
 
 		// frees a used particle @ given index
 		void FreeParticle(int indx);
@@ -48,7 +49,7 @@ class Pmanager {
         int KillParticles(double timestep);
 
 		// assigns particle an initial velocity and center...
-		void UseParticle(Vector3d c0, Vector3d v0, double ts, Vector4d color, double m, double coefff, double coeffr, int blend, int bs);
+		void UseParticle(Vector3d c0, Vector3d v0, double ts, Vector4d color, double m, double coefff, double coeffr, int blend);
         void EnableBlend(int bs);
 
 		// draws all the used particles

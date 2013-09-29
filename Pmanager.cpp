@@ -29,6 +29,12 @@ Pmanager::~Pmanager() {
 void Pmanager::SetMaxPart(int numofp) {
     nmaxparticles = numofp;
     Particles = new Particle[nmaxparticles];
+    /**
+    int i;
+    for (i = 0; i < nmaxparticles; i++ ) {
+        Particles[i].SetMaxHistory(bs);
+        Particles[i].PrintInfo();
+    }**/
 }
 
 void Pmanager::SetStopped(int type) { Stopped = type; }
@@ -42,13 +48,19 @@ int Pmanager::GetNused() { return nused; }
 
 
 int Pmanager::HasFreeParticles() {
-    return nmaxparticles-nused;
+//cout << "nmaxparticles: "<< nmaxparticles << " --- "<< "nused: " << nused << endl;
+    if(nused >= nmaxparticles) return false;
+    else return true;
 }
 
-void Pmanager::UseParticle(Vector3d c0, Vector3d v0, double ts, Vector4d color, double m, double coefff, double coeffr, int blend, int bs) {
+int Pmanager::FreePLeft() {
+    return (nmaxparticles-nused);
+}
+
+void Pmanager::UseParticle(Vector3d c0, Vector3d v0, double ts, Vector4d color, double m, double coefff, double coeffr, int blend) {
 //cout << "UseParticle() nused's before " << nused << endl;
+
 	Particles[nused].SetInUse(true);
-	Particles[nused].SetMaxHistory(bs);
 	Particles[nused].A.SetC0(c0);
 	Particles[nused].A.SetCenter(c0);
 	Particles[nused].A.SetV0(v0);

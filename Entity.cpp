@@ -28,6 +28,7 @@ void Entity::SetRest(int rest) { Rest = rest; }
 void Entity::SetStart(int start) { Start = start; }
 void Entity::SetStop(int stop) { Stop = stop; }
 void Entity::SetStep(int step) { Step = step; }
+void Entity::SetRadius(double r) { Radius = r; }
 
 //
 // Getters
@@ -36,6 +37,7 @@ int Entity::IsRest() { return Rest; }
 int Entity::IsStart() { return Start; }
 int Entity::IsStop() { return Stop; }
 int Entity::IsStep() { return Step; }
+double Entity::GetRadius() { return Radius; }
 
 
 //

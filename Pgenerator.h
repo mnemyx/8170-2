@@ -34,6 +34,7 @@ class Pgenerator {
         Vector3d P1;                // if its a plane
         Vector3d P2;                // if its a plane
         Vector3d P3;                // if its a plane
+        int internalcnt;
 
 		// i need a base for the stuff...
 		double Mean;
@@ -65,7 +66,7 @@ class Pgenerator {
 		void SetBaseColor(Vector4d newbc);
 
 		// generate random velocity, center, color, mass
-		void GenerateAttr();
+		void GenerateAttr(int spdir);
 		Vector4d GenerateColor(Vector4d c);
 		void MoveGenerator(double timestep);
 

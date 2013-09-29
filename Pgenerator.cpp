@@ -27,6 +27,7 @@ Pgenerator::Pgenerator() {
 	P1 = ta;
 	P2 = ta;
 	P3 = ta;
+    internalcnt = 0;
 
 	Mean = StdDev = BaseMass = MStdDev = CStdDev = BaseCoefff = BaseCoeffr = GeneratedMass = 0.0;
 
@@ -77,7 +78,7 @@ void Pgenerator::SetModel(int orientation) {
 void Pgenerator::SetBaseColor(Vector4d newbc) { BaseColor = newbc; }
 
 
-void Pgenerator::GenerateAttr() {
+void Pgenerator::GenerateAttr(int spdir) {
 	double smallr = drand48() * drand48();
 	Vector3d smallv;
 	smallv.set(drand48() * drand48(), drand48() * drand48(), drand48() * drand48());
@@ -100,7 +101,33 @@ void Pgenerator::GenerateAttr() {
 			GeneratedV0 = gauss(Mean, StdDev, 0) * unit + smallv;
 
 			break;
+        case SPHERE:
+            if(spdir) {
+                if(internalcnt == 0) internalcnt = Shape.GetNtriangles() - 1;
 
+                if(internalcnt > Shape.GetNtriangles() / 2) {
+                    internalcnt--;
+                } else {
+                    internalcnt = Shape.GetNtriangles() - 1;
+                }
+            } else {
+                if(internalcnt == 0)  internalcnt = Shape.GetNtriangles() / 2;
+
+                if (internalcnt > 0) {
+                    internalcnt--;
+                } else {
+                    internalcnt = Shape.GetNtriangles() / 2;
+                }
+            }
+
+            vertices = Shape.GetTriangle(internalcnt);
+			p2 = Shape.GetVertex(vertices.z);
+
+            GeneratedC0 = p2;
+			//GeneratedC0 = smallr * p1;
+			GeneratedV0 = gauss(Mean, StdDev, 0) * Shape.GetNormal(internalcnt) + smallv;
+
+			break;
 		// most of my other stuff have triangles...
 		default:
 			vertices = Shape.GetTriangle(triIndx);
@@ -122,6 +149,7 @@ void Pgenerator::GenerateAttr() {
 			//( Shape.GetNormal(triIndx)).print();
 			//cout << endl ;
 			GeneratedC0 = p2 + u * (p0 - p2) + v * (p1 - p2) + (smallr * Shape.GetNormal(triIndx));
+			//GeneratedC0 = smallr * p1;
 			GeneratedV0 = gauss(Mean, StdDev, 0) * Shape.GetNormal(triIndx) + smallv;
 
 			break;
@@ -152,7 +180,7 @@ void Pgenerator::MoveGenerator(double ts) {
         Velocity.set(Velocity.x * -1, Velocity.y, Velocity.z);
     if(tempc.y+Radius > 60)
         Velocity.set(Velocity.x, Velocity.y * -1, Velocity.z);
-    if(tempc.y-Radius < 0)
+    if(tempc.y-Radius < -60)
         Velocity.set(Velocity.x, Velocity.y * -1, Velocity.z);
     if(tempc.z+Radius > 60)
         Velocity.set(Velocity.x, Velocity.y, Velocity.z * -1);

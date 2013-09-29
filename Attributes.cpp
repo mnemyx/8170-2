@@ -167,7 +167,7 @@ void Attributes::CalcPtAttract(Vector3d p0, Vector3d g) {
     u = (Center - p0).normalize();
     d = (Center - p0).norm();
 
-    Acceleration = Acceleration + ((- g * ( Mass / (d * d)) * u) / Mass);
+    Acceleration = Acceleration + ((- g * ( 1 / (d * d)) * u));
 }
 
 //////////// DEBUGGING ///////////////

@@ -20,6 +20,8 @@ class Entity : public Model {		// entity is a model but has various variables to
       int Step;
       int Start;
 
+      double Radius;
+
   public:
     Attributes A;
 
@@ -31,12 +33,14 @@ class Entity : public Model {		// entity is a model but has various variables to
 	void SetStop(int type);
 	void SetStart(int type);
 	void SetStep(int type);
+	void SetRadius(double r);
 
 	// Getters
 	int IsRest();
 	int IsStop();
 	int IsStart();
 	int IsStep();
+	double GetRadius();
 
 	// Functions
 	// FOR SECOND PROJECT:
