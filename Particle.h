@@ -19,7 +19,7 @@
 #  include <GL/glut.h>
 #endif
 
-#define MAXHIST		15
+#define MAXHIST		25
 
 class Particle {
 	private:

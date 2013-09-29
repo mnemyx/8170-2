@@ -55,7 +55,7 @@ void Particle::Draw() {
 
 void Particle::AddHistory(Vector3d c) {
     int i;
-    cout << nhistory << endl;
+    cout << "nhistory before --- " << nhistory << endl;
 	if(nhistory == MAXHIST){
 		for (i = 0; i < nhistory - 1; i++) {
             History[i] = History[i+1];
@@ -64,6 +64,7 @@ void Particle::AddHistory(Vector3d c) {
 	} else {
         History[nhistory] = c;
         nhistory++;
+        cout << "nhistory after: "<< nhistory << endl;
 	}
 }
 

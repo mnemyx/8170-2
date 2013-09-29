@@ -198,6 +198,7 @@ void Simulate(){
     // for now, kill off particles whose age > 20
     int killed = Manager.KillParticles(Time);
 
+    cout << "killed: " << killed << endl;
     Generator.MoveGenerator(TimeStep);
 
     // for every particle the manager has....

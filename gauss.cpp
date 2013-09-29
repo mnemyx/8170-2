@@ -32,7 +32,7 @@ double gauss(double mean, double std, int seed)
        8.41482E-01, 9.34615E-01, 1.03652E+00, 1.15048E+00,
        1.28167E+00, 1.43933E+00, 1.64500E+00, 1.96000E+00,
        3.87000E+00};
-  
+
   static int first_time = 1;
 
   double u;
@@ -42,15 +42,15 @@ double gauss(double mean, double std, int seed)
 
   if (first_time){
 #ifdef WIN32
-    srand((unsigned)seed);
+    //srand((unsigned)seed);
 #else
-    srand48(seed);
+    //srand48(seed);
 #endif
     first_time = 0;
   }
 
   //
-  // compute uniform random number between 0.0 - 0.5, and a sign with 
+  // compute uniform random number between 0.0 - 0.5, and a sign with
   // probability 1/2 of being either + or -
   //
 #ifdef WIN32

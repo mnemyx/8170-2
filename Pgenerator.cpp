@@ -11,8 +11,8 @@
 using namespace std;
 
 Pgenerator::Pgenerator() {
-	srand48(time(0));
-	gauss(1,1,time(0));
+	//srand48(time(0));
+	//gauss(1,1,time(0));
 
 	Vector ta(0.0, 0.0, 0.0);
     Vector tc(0.0, 0.0, 0.0, 1.0);
