@@ -145,7 +145,7 @@ void Attributes::AdjustAccVelPos(Vector3d pnormal, Vector3d pvertex, double t) {
 void Attributes::Reflect(Vector3d pnormal, Vector3d pvertex) {
     Vector3d vn, vt;
     Vector3d smallr;
-    smallr.set(.5, .5, .5);
+    smallr.set(.0001, .0001, .0001);
     double d;
 
     if (tempv * pnormal == 0) vn.set(0,0,0);
@@ -154,11 +154,11 @@ void Attributes::Reflect(Vector3d pnormal, Vector3d pvertex) {
     if (Velocity * pnormal == 0) vt = Velocity;
     else vt = Velocity - (Velocity * pnormal) * pnormal;
 
-    //Center = (fhit * Velocity) + smallr;  // need the center before we flip the velocity.
+    //Center = (fhit * Velocity) + smallr;  // need the center before we flip the velocity. - ((1 - Coefff) * vt)
     Velocity = tempv - ((1 + Coeffr) * (vn)) - ((1 - Coefff) * vt);
 
     d = (tempc - pvertex) * pnormal + .00001;
-    Center = tempc - d * pnormal + smallr ;
+    Center = tempc - d * pnormal + smallr;
 }
 
 void Attributes::CalcPtAttract(Vector3d p0, Vector3d g) {
