@@ -15,10 +15,11 @@
 #include "gauss.h"
 #include "time.h"
 
-#define POINT 0
-#define CIRCLE 1
-#define SPHERE 2
-#define LINE 3		// augh...I'm overwhelming myself
+#define POINT       0
+#define CIRCLE      1
+#define SPHERE      2
+#define LINE        3		// augh...I'm overwhelming myself
+#define PLANE       4
 
 class Pgenerator {
 	private:
@@ -28,7 +29,11 @@ class Pgenerator {
 		Vector3d Center;
 		Vector3d Velocity;		// could be moving...but uh, for now, let's not move it.
 
-		double Radius;              // if it's a sphere?
+		double Radius;              // if it's a sphere OR circle
+		Vector3d P0;                // if its a plane
+        Vector3d P1;                // if its a plane
+        Vector3d P2;                // if its a plane
+        Vector3d P3;                // if its a plane
 
 		// i need a base for the stuff...
 		double Mean;
@@ -54,6 +59,7 @@ class Pgenerator {
 		// setters
 		void SetBaseAttr(int type, double bs, double sd, double bm, double msd, Vector4d bc, double csd, double pnum, double coefff, double coeffr);
 		void SetCenterRadius(Vector3d center, double radius);
+		void SetPlanePts(Vector3d p0, Vector3d p1, Vector3d p2, Vector3d p3);
 		void SetVelocity(Vector3d v);
 		void SetModel(int orientation = 2);
 		void SetBaseColor(Vector4d newbc);

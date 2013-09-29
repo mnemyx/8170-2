@@ -10,16 +10,16 @@
 #ifndef _PARTICLE_H_
 #define _PARTICLE_H_
 
+#include "Vector.h"
+#include "Attributes.h"
+
 #ifdef __APPLE__
 #  include <GLUT/glut.h>
 #else
 #  include <GL/glut.h>
 #endif
 
-#define MAXHIST		25
-
-#include "Vector.h"
-#include "Attributes.h"
+#define MAXHIST		15
 
 class Particle {
 	private:

@@ -202,6 +202,7 @@ void Simulate(){
 
     // for every particle the manager has....
     for (j = 0; j < Manager.GetNused(); j++ ) {
+         //Manager.Particles[j].A.PrintAttr();
 
         // get the new acceleration
         Manager.Particles[j].A.CalcAccel(env.G, env.Wind, env.Viscosity);
@@ -227,11 +228,13 @@ void Simulate(){
         if(phit != -1) {
           // reflect it from the plane -- data during collision
           Manager.Particles[j].A.Reflect(Sp.GetNormal(phit), Sp.GetVertex(Sp.GetTriangle(phit).x));
+          Manager.Particles[j].AddHistory(Manager.Particles[j].A.GetCenter());
 
           //DrawScene(1, ihit);  // should do something with this in terms of collision; change draw scene function
         } else {
             Manager.Particles[j].A.SetVelocity(Manager.Particles[j].A.GetTempv());
             Manager.Particles[j].A.SetCenter(Manager.Particles[j].A.GetTempc());
+            Manager.Particles[j].AddHistory(Manager.Particles[j].A.GetCenter());
         }
 
     }
@@ -241,7 +244,7 @@ void Simulate(){
     if(freep = Manager.HasFreeParticles() > 0) {
         for(i = 0; i < freep || i < Generator.GetPNum(); i++) {
             Generator.GenerateAttr();
-            Manager.UseParticle(Generator.GenC0(), Generator.GenV0(), Time, Generator.GenC0(), Generator.GenMass(), Generator.GetCoefff(), Generator.GetCoeffr(), 0);
+            Manager.UseParticle(Generator.GenC0(), Generator.GenV0(), Time, Generator.GenC0(), Generator.GenMass(), Generator.GetCoefff(), Generator.GetCoeffr(), 1);
         }
     }
 
@@ -281,7 +284,7 @@ void LoadParameters(char *filename){
 
     FILE *paramfile;
 
-    double numofparticles, bspeed, speedstd, bmass, bstd, colstd, coeffr, coefff;
+    double numofparticles, bspeed, speedstd, bmass, bstd, colstd, coeffr, coefff, genr, psize;
     Vector3d  bcenter, bvelocity;
     Vector4d bcolor;
 
@@ -292,25 +295,27 @@ void LoadParameters(char *filename){
 
     ParamFilename = filename;
 
-    if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
-    &TimeStep, &DispTime, &numofparticles,
+    if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+    &TimeStep, &DispTime, &numofparticles, &psize,
     &bspeed, &speedstd,
     &bmass, &bstd,
     &(bcolor.x), &(bcolor.y), &(bcolor.z), &(bcolor.w), &colstd,
     &coeffr, &coefff,
-    &(bcenter.x), &(bcenter.y), &(bcenter.z),
+    &(bcenter.x), &(bcenter.y), &(bcenter.z), &genr,
     &(bvelocity.x), &(bvelocity.y), &(bvelocity.z),
     &(env.Wind.x), &(env.Wind.y), &(env.Wind.z),
     &(env.G.x), &(env.G.y), &(env.G.z),
-    &env.Viscosity) != 27){
+    &env.Viscosity) != 29){
         fprintf(stderr, "error reading parameter file %s\n", filename);
         fclose(paramfile);
         exit(1);
     }
 
-    Generator.SetBaseAttr(0, bspeed, speedstd, bmass, bstd, bcolor, colstd, numofparticles, coefff, coeffr);
-    Generator.SetCenterRadius(bcenter, 0);
+
+    Generator.SetBaseAttr(2, bspeed, speedstd, bmass, bstd, bcolor, colstd, numofparticles, coefff, coeffr);
+    Generator.SetCenterRadius(bcenter, genr);
     Generator.SetVelocity(bvelocity);
+    Generator.SetModel();
 
     TimeStepsPerDisplay = Max(1, int(DispTime / TimeStep + 0.5));
     TimerDelay = int(0.5 * TimeStep * 1000);

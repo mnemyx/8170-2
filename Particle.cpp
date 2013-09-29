@@ -7,9 +7,6 @@
 ********************************************************/
 
 #include "Particle.h"
-#include <cstdlib>
-
-#include "Vector.h"
 
 using namespace std;
 
@@ -36,14 +33,19 @@ void Particle::Draw() {
         glEnd();
     } else {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glColor4f(A.GetColor().x, A.GetColor().y, A.GetColor().z, A.GetColor().w);
-
-        glBegin(GL_LINE_STRIP);
-            glVertex3f(A.GetCenter().x, A.GetCenter().y, A.GetCenter().z);
-            for (i = nhistory - 1; i >= 0; i++) {
+        if(nhistory == 1) {
+            glBegin(GL_LINE);
+                glColor4f(A.GetColor().x, A.GetColor().y, A.GetColor().z, 1);
+                glVertex3f(History[1].x, History[1].y, History[1].z);
+                glColor4f(A.GetColor().x, A.GetColor().y, A.GetColor().z, 0);
+                glVertex3f(History[0].x, History[0].y, History[0].z);
+        } else {
+            glBegin(GL_LINE_STRIP);
+            for (i = nhistory - 1; i >= 0; i--) {
                 glColor4f(A.GetColor().x, A.GetColor().y, A.GetColor().z, (i/(nhistory-1)));
                 glVertex3f(History[i].x, History[i].y, History[i].z);
             }
+        }
         glEnd();
     }
 	glDisable(GL_BLEND);
@@ -53,7 +55,7 @@ void Particle::Draw() {
 
 void Particle::AddHistory(Vector3d c) {
     int i;
-
+    cout << nhistory << endl;
 	if(nhistory == MAXHIST){
 		for (i = 0; i < nhistory - 1; i++) {
             History[i] = History[i+1];

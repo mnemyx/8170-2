@@ -1,13 +1,13 @@
-0.05	.01      5
+0.05	.01      5      10000
 
-0     10
+0     35
 20      10
 1       1       1       1       .05
 
-.8
+.4
 .2
 
-0       50       0
+0       50       0      40
 0       0       0
 
 0         0      0
@@ -16,7 +16,7 @@
 
 parameters format
 ===========================================
-timestep    displaytime     #particlestogenerat
+timestep    displaytime     #particlestogenerate    #maxparticles
 
 basespeed       speed_stddeviation
 basemass        mass_stddeviation
@@ -25,7 +25,7 @@ basecolor.r     basecolor.g         basecolor.b     basecolor.a         color_st
 coefficient of restitution
 coeffition of friction
 
-generatorcenter.x   generatorcenter.y   generatorcenter.z
+generatorcenter.x   generatorcenter.y   generatorcenter.z       generator.r
 generatorvelocity.x generatorvelocity.y generatorvelocity.z
 
 wind.x  wind.y  wind.z

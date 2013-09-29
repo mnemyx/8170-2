@@ -13,6 +13,28 @@ using namespace std;
 Pgenerator::Pgenerator() {
 	srand48(time(0));
 	gauss(1,1,time(0));
+
+	Vector ta(0.0, 0.0, 0.0);
+    Vector tc(0.0, 0.0, 0.0, 1.0);
+
+	Type = POINT;
+	Center = ta;
+	Velocity = ta;
+
+	Radius = 0;
+	P0 = ta;
+	P1 = ta;
+	P2 = ta;
+	P3 = ta;
+
+	Mean = StdDev = BaseMass = MStdDev = CStdDev = BaseCoefff = BaseCoeffr = GeneratedMass = 0.0;
+
+	BaseColor = tc;
+	GeneratedV0 = ta;
+	GeneratedC0 = ta;
+	GeneratedColor = tc;
+
+	PNum = 0;
 }
 
 void Pgenerator::SetBaseAttr(int type, double bs, double sd, double bm, double msd, Vector4d bc, double csd, double pnum, double coefff, double coeffr) {
@@ -33,6 +55,10 @@ void Pgenerator::SetCenterRadius(Vector3d center, double radius) {
 	Radius = radius;
 }
 
+void Pgenerator::SetPlanePts(Vector3d p0, Vector3d p1, Vector3d p2, Vector3d p3) {
+    P0 = p0; P1 = p1; P2 = p2; P3 = p3;
+}
+
 void Pgenerator::SetVelocity(Vector3d v) {
     Velocity = v;
 }
@@ -41,6 +67,7 @@ void Pgenerator::SetModel(int orientation) {
 	switch (Type) {
 		case CIRCLE: Shape.BuildCircle(Radius, orientation, Center.x, Center.y, Center.z); break;
 		case SPHERE: Shape.BuildSphere(Radius, Center.x, Center.y, Center.z); break;
+		case PLANE:  Shape.BuildPlane(P0, P1, P2, P3);
 	}
 }
 
@@ -58,7 +85,7 @@ void Pgenerator::GenerateAttr() {
 	Vector3d unit;
 
 	// for triangles- need random index, need temp vectors, u & v
-	int triIndx = (int) drand48() * (Shape.GetNtriangles() - 1);
+	int triIndx = (int) (drand48() * (Shape.GetNtriangles() - 1));
 	Vector3d vertices, p0, p1, p2;
 	double u, v;
 

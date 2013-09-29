@@ -8,29 +8,26 @@
 
 #include "Attributes.h"
 
-#include <cstdlib>
-#include <cstdio>
-#include <math.h>
-
 using namespace std;
 
 //
 // Constructor
 //
 Attributes::Attributes() {
-    Vector3d ta; ta.set(0,0,0);
-    Vector4d tc; tc.set(0,0,0,1);
+    Vector ta(0.0, 0.0, 0.0);
+    Vector tc(0.0, 0.0, 0.0, 1.0);
 
-    V0 = Velocity = C0 = Center = Acceleration = tempv = tempc = ta;
+    V0 = ta;
+    Velocity = ta;
+    C0 = ta;
+    Center = ta;
+    Acceleration = ta;
+    tempv = ta;
+    tempc = ta;
 
     Color = tc;
 
-    Mass = 0;
-
-    Coefff = 0.4;
-    Coeffr = 0.4;
-
-    EPS = 0.01;
+    Mass = Coefff = Coeffr = EPS = 0.0;
 }
 
 void Attributes::InitAttr(Vector3d v0, Vector3d v, Vector3d c0, Vector3d c, Vector4d color, double m, double coefff, double coeffr, float eps) {

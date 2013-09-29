@@ -11,7 +11,6 @@
 
 #include "Vector.h"
 #include "Model.h"
-#include <vector>
 
 #ifdef __APPLE__
 #  include <GLUT/glut.h>

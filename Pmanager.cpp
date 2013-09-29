@@ -7,7 +7,6 @@
 ********************************************************/
 
 #include "Pmanager.h"
-#include "Vector.h"
 
 using namespace std;
 
@@ -17,6 +16,11 @@ Pmanager::Pmanager() {
 	Started = true;
 	Stopped = true;
 	Step = false;
+
+	int i;
+
+	for (i = 0; i < MAXPART; i++)
+        Particles[i].Reset();
 }
 
 void Pmanager::SetStopped(int type) { Stopped = type; }
@@ -74,6 +78,7 @@ void Pmanager::UseParticle(Vector3d c0, Vector3d v0, double ts, Vector4d color, 
 	Particles[nused].A.SetCoefff(coefff);
 	Particles[nused].A.SetCoeffr(coeffr);
 	Particles[nused].SetBlend(blend);
+    Particles[nused].AddHistory(c0);
 
 	//Particles[nused].A.PrintAttr();
 

@@ -10,9 +10,9 @@
 #ifndef _PMANAGER_H_
 #define _PMANAGER_H_
 
-#define MAXPART		10000
-
 #include "Particle.h"
+
+#define MAXPART		10000
 
 class Pmanager {
 	private:
@@ -22,8 +22,9 @@ class Pmanager {
 		int Step;						// simulation is step mode
 
 	public:
+        Particle Particles[MAXPART];	// matrix of particles...
+
 		Pmanager();
-		Particle Particles[MAXPART];	// matrix of particles...
 
 		void SetStopped(int type);
 		void SetStarted(int type);

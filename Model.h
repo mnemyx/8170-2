@@ -27,7 +27,7 @@
 class Model{
 protected:
   Vector3d vertices[MAXVERTICES];   // vertex coordinates
-  int nvertices;		    // count of the number of vertices
+  int nvertices;		            // count of the number of vertices
   int triangles[MAXTRIANGLES][3];   // 3 vertex indices for each triangle
   Vector3d normals[MAXTRIANGLES];   // unit normal vector for each triangle
   int ntriangles;		    // count of the number of triangles
