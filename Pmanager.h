@@ -49,7 +49,7 @@ class Pmanager {
 
 		// assigns particle an initial velocity and center...
 		void UseParticle(Vector3d c0, Vector3d v0, double ts, Vector4d color, double m, double coefff, double coeffr, int blend, int bs);
-
+        void EnableBlend(int bs);
 
 		// draws all the used particles
 		void DrawSystem();

@@ -29,6 +29,7 @@ class Pgenerator {
 		Vector3d Velocity;		// could be moving...but uh, for now, let's not move it.
 
 		double Radius;              // if it's a sphere OR circle
+		int Orientation;
 		Vector3d P0;                // if its a plane
         Vector3d P1;                // if its a plane
         Vector3d P2;                // if its a plane

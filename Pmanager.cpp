@@ -67,6 +67,13 @@ void Pmanager::UseParticle(Vector3d c0, Vector3d v0, double ts, Vector4d color, 
 	//cout << "UseParticle() nused's after " << nused << endl;
 }
 
+void Pmanager::EnableBlend(int bs) {
+    int i;
+    for(i=0; i<nused; i++) {
+        Particles[i].SetBlend(bs);
+    }
+}
+
 void Pmanager::FreeParticle(int indx) {
     if (indx < nused - 1) {
         //cout << "!! freeing indx: " << indx << " from nused: " << nused << endl;

@@ -73,7 +73,7 @@ void Particle::Draw() {
 
 void Particle::AddHistory(Vector3d c) {
     int i;
-    cout << "nhistory before --- " << nhistory << endl;
+    //cout << "nhistory before --- " << nhistory << endl;
 	if(nhistory == maxhistory){
 		for (i = 0; i < nhistory - 1; i++) {
             history[i] = history[i+1];
@@ -82,7 +82,7 @@ void Particle::AddHistory(Vector3d c) {
 	} else {
         history[nhistory] = c;
         nhistory++;
-        cout << "nhistory after: "<< nhistory << endl;
+        //cout << "nhistory after: "<< nhistory << endl;
 	}
 }
 

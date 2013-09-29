@@ -356,7 +356,7 @@ void InitSimulation(int argc, char* argv[]){
 
   LoadParameters(argv[1]);
 
-  Sp.BuildSphere(10,0,0,0);
+  Sp.BuildSphere(20,0,0,0);
 
   pa1.center.set(-40, 0, -5);
   pa1.g.set(200, 200, 200);
@@ -620,6 +620,12 @@ void handleKey(unsigned char key, int x, int y){
       MenuAttached = !MenuAttached;
       if(MenuAttached) { MakeMenu(); }
       else glutDetachMenu(GLUT_RIGHT_BUTTON);
+      break;
+
+    case 'b':
+    case 'B':
+      AllowBlend = !AllowBlend;
+      Manager.EnableBlend(AllowBlend);
       break;
 
     case 'r':
