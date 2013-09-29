@@ -26,14 +26,15 @@ KEY COMMANDS
 ==================================================================
 	m or M		IMPORTANT: transforming camera view to simulation control (default: camera)
 	p or P		switches from ortho to perspective views (default: perspective)
-	r or R      resets the simulation, so if you change parameters - this will re-read them
+	r or R      	resets the simulation, so if you change parameters - this will re-read them
+	b or B		changs from blend to non-blend mode
 	q or ESC	quit
 
 
 MOUSE COMMANDS
 ==================================================================
 	SIMULATION:
-	RMB			opens menu
+	RMB		opens menu
 	LMB 		triggers selected option
 
 	CAMERA: 		  left button		 |	   middle button  	|		right button
@@ -54,7 +55,7 @@ FILES
 	particles.cpp (main program)
 	Model.cpp, Model.h
 	Entity.cpp, Entity.h
-	State.cpp, State.h
+	Attributes.cpp, Attributes.h
 	Pgenerator.cpp, Pgenerator.h
 	Pmanager.cpp, Pmanager.h,
 	Particle.cpp, Particl.h
