@@ -42,9 +42,9 @@ double gauss(double mean, double std, int seed)
 
   if (first_time){
 #ifdef WIN32
-    //srand((unsigned)seed);
+    srand((unsigned)seed);
 #else
-    //srand48(seed);
+    srand48(seed);
 #endif
     first_time = 0;
   }
