@@ -204,6 +204,7 @@ void Simulate(){
     // for every particle the manager has....
     for (j = 0; j < Manager.GetNused(); j++ ) {
          //Manager.Particles[j].A.PrintAttr();
+         cout << "j: " << j << endl;
 
         // get the new acceleration
         Manager.Particles[j].A.CalcAccel(env.G, env.Wind, env.Viscosity);
@@ -229,18 +230,19 @@ void Simulate(){
         if(phit != -1) {
           // reflect it from the plane -- data during collision
           Manager.Particles[j].A.Reflect(Sp.GetNormal(phit), Sp.GetVertex(Sp.GetTriangle(phit).x));
-          Manager.Particles[j].AddHistory(Manager.Particles[j].A.GetCenter());
 
           //DrawScene(1, ihit);  // should do something with this in terms of collision; change draw scene function
         } else {
             Manager.Particles[j].A.SetVelocity(Manager.Particles[j].A.GetTempv());
             Manager.Particles[j].A.SetCenter(Manager.Particles[j].A.GetTempc());
-            Manager.Particles[j].AddHistory(Manager.Particles[j].A.GetCenter());
+
         }
 
+        cout << "Im adding inside the simulate for loop... " << endl;
+        Manager.Particles[j].AddHistory(Manager.Particles[j].A.GetCenter());
     }
 
-
+    cout << "ADDING!! " << endl;
     // generate particles if we can
     if(freep = Manager.HasFreeParticles() > 0) {
         for(i = 0; i < freep || i < Generator.GetPNum(); i++) {

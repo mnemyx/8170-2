@@ -6,11 +6,10 @@
   CPSC8170 - Proj 1   GBG   9/2013
 ****************************************************/
 
-#ifndef _STATE_H_
-#define _STATE_H_
+#ifndef _ATTR_H_
+#define _ATTR_H_
 
 #include "Vector.h"
-#include "Model.h"
 
 #ifdef __APPLE__
 #  include <GLUT/glut.h>

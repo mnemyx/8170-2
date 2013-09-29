@@ -12,9 +12,6 @@
 #include "Attributes.h"
 #include "Model.h"
 
-#define MAXSTEPS	10000
-#define SPDEPTH		3
-
 
 class Entity : public Model {		// entity is a model but has various variables to it...
   private:

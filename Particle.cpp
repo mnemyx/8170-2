@@ -36,14 +36,14 @@ void Particle::Draw() {
         if(nhistory == 1) {
             glBegin(GL_LINE);
                 glColor4f(A.GetColor().x, A.GetColor().y, A.GetColor().z, 1);
-                glVertex3f(History[1].x, History[1].y, History[1].z);
+                glVertex3f(history[1].x, history[1].y, history[1].z);
                 glColor4f(A.GetColor().x, A.GetColor().y, A.GetColor().z, 0);
-                glVertex3f(History[0].x, History[0].y, History[0].z);
+                glVertex3f(history[0].x, history[0].y, history[0].z);
         } else {
             glBegin(GL_LINE_STRIP);
             for (i = nhistory - 1; i >= 0; i--) {
                 glColor4f(A.GetColor().x, A.GetColor().y, A.GetColor().z, (i/(nhistory-1)));
-                glVertex3f(History[i].x, History[i].y, History[i].z);
+                glVertex3f(history[i].x, history[i].y, history[i].z);
             }
         }
         glEnd();
@@ -58,11 +58,11 @@ void Particle::AddHistory(Vector3d c) {
     cout << "nhistory before --- " << nhistory << endl;
 	if(nhistory == MAXHIST){
 		for (i = 0; i < nhistory - 1; i++) {
-            History[i] = History[i+1];
+            history[i] = history[i+1];
 		}
-		History[nhistory - 1] = c;
+		history[nhistory - 1] = c;
 	} else {
-        History[nhistory] = c;
+        history[nhistory] = c;
         nhistory++;
         cout << "nhistory after: "<< nhistory << endl;
 	}
@@ -78,3 +78,5 @@ void Particle::SetBlend(int blend) { Blend = blend; }
 double Particle::GetBirth() { return Birth; }
 double Particle::GetAge(double currentTimestep) { return currentTimestep - Birth; }
 int Particle::IsInUse() { return InUse; }
+
+int Particle::Getnhistory() { return nhistory; }

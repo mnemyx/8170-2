@@ -33,7 +33,7 @@ int Pmanager::HasFreeParticles() {
 }
 
 void Pmanager::UseParticle(Vector3d c0, Vector3d v0, double ts, Vector4d color, double m, double coefff, double coeffr, int blend) {
-
+cout << "UseParticle() nused's before " << nused << endl;
 	Particles[nused].SetInUse(true);
 	Particles[nused].A.SetC0(c0);
 	Particles[nused].A.SetCenter(c0);
@@ -50,22 +50,24 @@ void Pmanager::UseParticle(Vector3d c0, Vector3d v0, double ts, Vector4d color, 
 	//Particles[nused].A.PrintAttr();
 
 	nused++;
+	cout << "UseParticle() nused's after " << nused << endl;
 }
 
 void Pmanager::FreeParticle(int indx) {
-    if (indx < nused) {
-        if (indx < nused - 1) {
-            cout << "!! freeing indx: " << indx << " from nused: " << nused << endl;
-            Particles[indx] = Particles[nused-1];
-            Particles[nused-1].Reset();
-            nused--;
-        } else {
-            cout << "-- freeing indx: " << indx << " from nused: " << nused << endl;
-            Particles[indx].Reset();
-            nused--;
-        }
-        cout << "new nused: " << nused << endl;
-	}
+    if (indx < nused - 1) {
+        cout << "!! freeing indx: " << indx << " from nused: " << nused << endl;
+        Particles[indx] = Particles[nused-1];
+        cout << "NHISTORY_NEW: " << Particles[indx].Getnhistory() << endl;
+        Particles[nused-1].Reset();
+        cout << "NHISTORY_SHOULDBE0: " << Particles[nused-1].Getnhistory() << endl;
+        nused--;
+    } else {
+        cout << "-- freeing indx: " << indx << " from nused: " << nused << endl;
+        Particles[indx].Reset();
+        cout << "NHISTORY_SHOULDALSOBE0: " << Particles[indx].Getnhistory() << endl;
+        nused--;
+    }
+    cout << "new nused: " << nused << endl;
 }
 
 void Pmanager::KillAll() {

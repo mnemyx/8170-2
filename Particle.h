@@ -10,7 +10,6 @@
 #ifndef _PARTICLE_H_
 #define _PARTICLE_H_
 
-#include "Vector.h"
 #include "Attributes.h"
 
 #ifdef __APPLE__
@@ -19,7 +18,7 @@
 #  include <GL/glut.h>
 #endif
 
-#define MAXHIST		25
+#define MAXHIST		10
 
 class Particle {
 	private:
@@ -27,7 +26,7 @@ class Particle {
 
 		double Birth;					// store NTimeSteps of when the particle is "born" (for age)
 
-		Vector3d History[MAXHIST];		// particle's history of centers
+		Vector3d history[MAXHIST];		// particle's history of centers
 		int nhistory;					// history indx
 
 		int Blend;                      // draw in blend mode toggle
@@ -49,9 +48,7 @@ class Particle {
         double GetBirth();
 		double GetAge(double currentTimestep);
 		int IsInUse();
-
-        //////////// DEBUGGING ///////////////
-        void PrintAttr();
+		int Getnhistory();
 };
 
 #endif

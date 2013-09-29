@@ -10,7 +10,6 @@
 #ifndef _PGENERATOR_H_
 #define _PGENERATOR_H_
 
-#include "Vector.h"
 #include "Model.h"
 #include "gauss.h"
 #include "time.h"
