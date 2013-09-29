@@ -16,12 +16,16 @@
 #define MAXVERTICES   3600		  // shapes limited to 1000 vertices
 #define MAXTRIANGLES  (MAXVERTICES / 3)
 
-#define VERTICALX 0
-#define VERTICALZ 1
-#define HORIZON 2
+#define VERTICALX   0
+#define VERTICALZ   1
+#define HORIZON     2
+
+#define FRONTBACK		0
+#define SIDES			1
+#define TOPBOTTOM		2
 
 class Model{
-private:
+protected:
   Vector3d vertices[MAXVERTICES];   // vertex coordinates
   int nvertices;		    // count of the number of vertices
   int triangles[MAXTRIANGLES][3];   // 3 vertex indices for each triangle

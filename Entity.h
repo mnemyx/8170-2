@@ -30,16 +30,16 @@ class Entity : public Model {		// entity is a model but has various variables to
     Entity();
 
 	// Setters
-	void Rest(int type);
-	void Stop(int type);
-	void Start(int type);
-	void Step(int type);
+	void SetRest(int type);
+	void SetStop(int type);
+	void SetStart(int type);
+	void SetStep(int type);
 
 	// Getters
-	int Rest();
-	int Stop();
-	int Start();
-	int Step();
+	int IsRest();
+	int IsStop();
+	int IsStart();
+	int IsStep();
 
 	// Functions
 	// FOR SECOND PROJECT:

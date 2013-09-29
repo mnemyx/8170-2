@@ -103,7 +103,6 @@ static double Time = 0;
 Pmanager Manager;
 Pgenerator Generator;
 Entity Sp;
-Vector3d Pa1;
 
 struct Env {
     Vector3d G;
@@ -175,7 +174,7 @@ void DrawScene(int collision, int cubeIndx){
   glClear(GL_COLOR_BUFFER_BIT);
   glClear(GL_DEPTH_BUFFER_BIT);
 
-  //DrawNonMovingObj();
+  DrawNonMovingObj();
   DrawMovingObj();
 
   glutSwapBuffers();
@@ -205,34 +204,34 @@ void Simulate(){
     for (j = 0; j < Manager.GetNused(); j++ ) {
 
         // get the new acceleration
-        Manager.Particles[j].CalcAccel(env.G, env.Wind, env.Viscosity);
+        Manager.Particles[j].A.CalcAccel(env.G, env.Wind, env.Viscosity);
 
         //check if we hit within the attractor's grasp
-        if((Manager.Particles[j].GetCenter() - pa1.center).norm() < pa1.r)
-            Manager.Particles[j].CalcAttractAccel(pa1.center, pa1.g);
-        if((Manager.Particles[j].GetCenter() - pa2.center).norm() < pa2.r)
-            Manager.Particles[j].CalcAttractAccel(pa2.center, pa2.g);
+        if((Manager.Particles[j].A.GetCenter() - pa1.center).norm() < pa1.r)
+            Manager.Particles[j].A.CalcPtAttract(pa1.center, pa1.g);
+        if((Manager.Particles[j].A.GetCenter() - pa2.center).norm() < pa2.r)
+            Manager.Particles[j].A.CalcPtAttract(pa2.center, pa2.g);
 
 
         // evil Euler integration to get velocity and position at next timestep
-        Manager.Particles[j].CalcTempCV(TimeStep);
+        Manager.Particles[j].A.CalcTempCV(TimeStep);
 
         // Manager.Particles[j].PrintAttr();
         if((int)Manager.Particles[j].GetAge(Time) % 5 == 0)
-            Manager.Particles[j].SetColor(Generator.GenerateColor(Manager.Particles[j].GetColor()));
+            Manager.Particles[j].A.SetColor(Generator.GenerateColor(Manager.Particles[j].A.GetColor()));
 
         phit = -1;
-        phit = Sp.CheckCollision(Manager.Particles[j].GetCenter(), Manager.Particles[j].GetTempv(), Manager.Particles[j].GetTempc());
+        phit = Sp.CheckCollision(Manager.Particles[j].A.GetCenter(), Manager.Particles[j].A.GetTempv(), Manager.Particles[j].A.GetTempc());
 
 
         if(phit != -1) {
           // reflect it from the plane -- data during collision
-          Manager.Particles[j].Reflect(Sp.GetNormal(phit), Sp.GetVertex(Sp.GetTriangle(phit).x));
+          Manager.Particles[j].A.Reflect(Sp.GetNormal(phit), Sp.GetVertex(Sp.GetTriangle(phit).x));
 
           //DrawScene(1, ihit);  // should do something with this in terms of collision; change draw scene function
         } else {
-            Manager.Particles[j].SetVelocity(Manager.Particles[j].GetTempv());
-            Manager.Particles[j].SetCenter(Manager.Particles[j].GetTempc());
+            Manager.Particles[j].A.SetVelocity(Manager.Particles[j].A.GetTempv());
+            Manager.Particles[j].A.SetCenter(Manager.Particles[j].A.GetTempc());
         }
 
     }
@@ -242,7 +241,7 @@ void Simulate(){
     if(freep = Manager.HasFreeParticles() > 0) {
         for(i = 0; i < freep || i < Generator.GetPNum(); i++) {
             Generator.GenerateAttr();
-            Manager.UseParticle(Generator.GenC0(), Generator.GenV0(), Time, Generator.GenC0(), Generator.GenMass(), Generator.GetCoefff(), Generator.GetCoeffr());
+            Manager.UseParticle(Generator.GenC0(), Generator.GenV0(), Time, Generator.GenC0(), Generator.GenMass(), Generator.GetCoefff(), Generator.GetCoeffr(), 0);
         }
     }
 
@@ -345,7 +344,7 @@ void InitSimulation(int argc, char* argv[]){
 
   LoadParameters(argv[1]);
 
-  Sp.BuildSphere(10,1,0,0,0);
+  Sp.BuildSphere(20,0,0,0);
 
   pa1.center.set(-40, 0, -5);
   pa1.g.set(200, 200, 200);

@@ -19,6 +19,7 @@
 #define MAXHIST		25
 
 #include "Vector.h"
+#include "Attributes.h"
 
 class Particle {
 	private:

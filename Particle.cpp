@@ -38,7 +38,7 @@ void Particle::Draw() {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glColor4f(A.GetColor().x, A.GetColor().y, A.GetColor().z, A.GetColor().w);
 
-        glBegin(GL_LINE_POINTS);
+        glBegin(GL_LINE_STRIP);
             glVertex3f(A.GetCenter().x, A.GetCenter().y, A.GetCenter().z);
             for (i = nhistory - 1; i >= 0; i++) {
                 glColor4f(A.GetColor().x, A.GetColor().y, A.GetColor().z, (i/(nhistory-1)));

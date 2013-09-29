@@ -77,7 +77,7 @@ class Attributes{
     void CalcTempCV(double ts);                             // calculate temp velocity & center;
     void CalcTempCV(double ts, double f);                   // calculate temp velocity & center;
     void ScaleVelocity(Vector3d pnormal);                   // FROM FIRST PROJ: Scales velocity at collision
-    void AdjustAccVelPos(Vector3d pnormal, Vector3d pvertex, double t)  // FROM FIRST PROJ: When putting sphere at rest. t is needed - distance from collision.
+    void AdjustAccVelPos(Vector3d pnormal, Vector3d pvertex, double t);  // FROM FIRST PROJ: When putting sphere at rest. t is needed - distance from collision.
     void Reflect(Vector3d pnormal, Vector3d pvertex);          // FROM SECOND PROJECT: don't do expensive calculations! just reflect the particle.
     void CalcPtAttract(Vector3d p0, Vector3d g);            // FROM SECOND PROJECT: calculates attraction acceleration
 

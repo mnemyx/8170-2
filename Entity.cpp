@@ -26,18 +26,18 @@ Entity::Entity(){
 //
 // Setters
 //
-void Entity::Rest(int rest) { Rest = rest; }
-void Entity::Start(int start) { Start = start; }
-void Entity::Stop(int stop) { Stop = stop; }
-void Entity::Step(int step) { Step = step; }
+void Entity::SetRest(int rest) { Rest = rest; }
+void Entity::SetStart(int start) { Start = start; }
+void Entity::SetStop(int stop) { Stop = stop; }
+void Entity::SetStep(int step) { Step = step; }
 
 //
 // Getters
 //
-int Entity::Rest() { return Rest; }
-int Entity::Start() { return Start; }
-int Entity::Stop() { return Stop; }
-int Entity::Step() { return Step; }
+int Entity::IsRest() { return Rest; }
+int Entity::IsStart() { return Start; }
+int Entity::IsStop() { return Stop; }
+int Entity::IsStep() { return Step; }
 
 
 //

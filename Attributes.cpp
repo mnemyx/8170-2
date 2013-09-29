@@ -109,8 +109,8 @@ void Attributes::ScaleVelocity(Vector3d pnormal) {
 	if (Velocity * unorm == 0) vt = Velocity;
 	else vt = Velocity - (Velocity * unorm) * unorm;
 
-	vn = -CoeffofRestitution * vn;
-	vt = (1 - CoeffofFriction) * vt;
+	vn = -Coeffr * vn;
+	vt = (1 - Coefff) * vt;
 
 	Velocity = vn + vt;
 }
@@ -146,7 +146,7 @@ void Attributes::AdjustAccVelPos(Vector3d pnormal, Vector3d pvertex, double t) {
 
 // reflect velocity off of plane
 void Attributes::Reflect(Vector3d pnormal, Vector3d pvertex) {
-    Vector3d vn;
+    Vector3d vn, vt;
     Vector3d smallr;
     smallr.set(.5, .5, .5);
     double d;
@@ -164,7 +164,7 @@ void Attributes::Reflect(Vector3d pnormal, Vector3d pvertex) {
     Center = tempc - d * pnormal + smallr ;
 }
 
-void Particle::CalcPtAttract(Vector3d p0, Vector3d g) {
+void Attributes::CalcPtAttract(Vector3d p0, Vector3d g) {
     Vector3d u, d;
 
     u = (Center - p0).normalize();

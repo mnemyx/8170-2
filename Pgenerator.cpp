@@ -40,7 +40,7 @@ void Pgenerator::SetVelocity(Vector3d v) {
 void Pgenerator::SetModel(int orientation) {
 	switch (Type) {
 		case CIRCLE: Shape.BuildCircle(Radius, orientation, Center.x, Center.y, Center.z); break;
-		case SPHERE: Shape.BuildSphere(Radius, 1, Center.x, Center.y, Center.z); break;
+		case SPHERE: Shape.BuildSphere(Radius, Center.x, Center.y, Center.z); break;
 	}
 }
 

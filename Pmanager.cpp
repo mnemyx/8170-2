@@ -46,7 +46,7 @@ int Pmanager::KillParticles(double ts) {
     Vector3d center;
 
     for (i = 0; i < nused; i++) {
-        center = Particles[i].GetCenter();
+        center = Particles[i].A.GetCenter();
 
         if(Particles[i].GetAge(ts) > 15
             || center.x > 80 || center.x < -80
