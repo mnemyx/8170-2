@@ -100,6 +100,8 @@ static int NSteps = 0;
 static int NTimeSteps = -1;
 static double Time = 0;
 
+static int Toggle = 0;
+
 Pmanager Manager;
 Pgenerator Generator1, Generator2;
 Entity Sp;
@@ -117,7 +119,7 @@ struct Attractor {
     Vector3d g;
     Vector3d center;
     double r;
-} pa1, pa2, pa3, pa4;
+} pa1;
 
 /************** DRAWING & SHADING FUNCTIONS ***********************/
 //
@@ -220,53 +222,46 @@ void Simulate(){
         //check if we hit within the attractor's grasp
         if((Manager.Particles[j].A.GetCenter() - pa1.center).norm() < pa1.r)
             Manager.Particles[j].A.CalcPtAttract(pa1.center, pa1.g);
-        if((Manager.Particles[j].A.GetCenter() - pa2.center).norm() < pa2.r)
-            Manager.Particles[j].A.CalcPtAttract(pa2.center, pa2.g);
-        if((Manager.Particles[j].A.GetCenter() - pa3.center).norm() < pa3.r)
-            Manager.Particles[j].A.CalcPtAttract(pa3.center, pa3.g);
-        if((Manager.Particles[j].A.GetCenter() - pa4.center).norm() < pa4.r)
-            Manager.Particles[j].A.CalcPtAttract(pa4.center, pa4.g);
+
 
         // evil Euler integration to get velocity and position at next timestep
         Manager.Particles[j].A.CalcTempCV(TimeStep);
 
         // Manager.Particles[j].PrintAttr();
-        /**if((int)Manager.Particles[j].GetAge(Time) % 5 == 0)
+        if((int)Manager.Particles[j].GetAge(Time) % 5 == 0)
             Manager.Particles[j].A.SetColor(Generator1.GenerateColor(Manager.Particles[j].A.GetColor()));
 
+        if(Toggle) {
+            if((Manager.Particles[j].A.GetTempc() - Sp.A.GetCenter()).norm() < Sp.GetRadius()) {
+                phit = -1;
+                phit = Sp.CheckCollision(Manager.Particles[j].A.GetCenter(), Manager.Particles[j].A.GetTempv(), Manager.Particles[j].A.GetTempc());
 
-        if((Manager.Particles[j].A.GetTempc() - Sp.A.GetCenter()).norm() < Sp.GetRadius()) {
-            phit = -1;
-            phit = Sp.CheckCollision(Manager.Particles[j].A.GetCenter(), Manager.Particles[j].A.GetTempv(), Manager.Particles[j].A.GetTempc());
-
-            if(phit != -1) {
-                // reflect it from the plane -- data during collision
-                Manager.Particles[j].A.Reflect(Sp.GetNormal(phit), Sp.GetVertex(Sp.GetTriangle(phit).x));
-                //DrawScene(1, ihit);  // should do something with this in terms of collision; change draw scene function
+                if(phit != -1) {
+                    // reflect it from the plane -- data during collision
+                    Manager.Particles[j].A.Reflect(Sp.GetNormal(phit), Sp.GetVertex(Sp.GetTriangle(phit).x));
+                    //DrawScene(1, ihit);  // should do something with this in terms of collision; change draw scene function
+                } else {
+                    Manager.Particles[j].A.SetVelocity(Manager.Particles[j].A.GetTempv());
+                    Manager.Particles[j].A.SetCenter(Manager.Particles[j].A.GetTempc());
+                }
             } else {
                 Manager.Particles[j].A.SetVelocity(Manager.Particles[j].A.GetTempv());
                 Manager.Particles[j].A.SetCenter(Manager.Particles[j].A.GetTempc());
             }
+        } else {
+            phit = -1;
+            phit = Pl.CheckCollision(Manager.Particles[j].A.GetCenter(), Manager.Particles[j].A.GetTempv(), Manager.Particles[j].A.GetTempc());
 
-        /**} else {
-            Manager.Particles[j].A.SetVelocity(Manager.Particles[j].A.GetTempv());
-            Manager.Particles[j].A.SetCenter(Manager.Particles[j].A.GetTempc());
+            if(phit != -1) {
+              // reflect it from the plane -- data during collision
+              Manager.Particles[j].A.Reflect(Pl.GetNormal(phit), Pl.GetVertex(Pl.GetTriangle(phit).x));
 
-        }**/
-/**
-        phit = -1;
-        phit = Pl.CheckCollision(Manager.Particles[j].A.GetCenter(), Manager.Particles[j].A.GetTempv(), Manager.Particles[j].A.GetTempc());
-
-        if(phit != -1) {
-          // reflect it from the plane -- data during collision
-          Manager.Particles[j].A.Reflect(Pl.GetNormal(phit), Pl.GetVertex(Pl.GetTriangle(phit).x));
-
-          //DrawScene(1, ihit);  // should do something with this in terms of collision; change draw scene function
-        } else {**/
-            Manager.Particles[j].A.SetVelocity(Manager.Particles[j].A.GetTempv());
-            Manager.Particles[j].A.SetCenter(Manager.Particles[j].A.GetTempc());
-        //}
-
+              //DrawScene(1, ihit);  // should do something with this in terms of collision; change draw scene function
+            } else {
+                Manager.Particles[j].A.SetVelocity(Manager.Particles[j].A.GetTempv());
+                Manager.Particles[j].A.SetCenter(Manager.Particles[j].A.GetTempc());
+            }
+        }
 
         //cout << "Im adding inside the simulate for loop... " << endl;
         Manager.Particles[j].AddHistory(Manager.Particles[j].A.GetCenter());
@@ -392,26 +387,14 @@ void InitSimulation(int argc, char* argv[]){
 
   LoadParameters(argv[1]);
 
-  Sp.BuildSphere(20,0,-10,0);
-  Sp.SetRadius(20);
+  Sp.BuildSphere(40,0,-10,-40);
+  Sp.SetRadius(40);
 
-  Pl.BuildPlane(Vector3d(-20, -10, 15), Vector3d(20, -10, 15), Vector3d(20, 10, -20), Vector3d(-10, 10, -20));
+  Pl.BuildPlane(Vector3d(-20, 0, 15), Vector3d(20, 0, 15), Vector3d(20, 0, -20), Vector3d(-10, 0, -20));
 
-  pa1.center.set(-20, -10, 15);
-  pa1.g.set(5,5,5);
+  pa1.center.set(0,0,0);
+  pa1.g.set(25,25,25);
   pa1.r = 25;
-
-  pa2.center.set(20, -10, 15);
-  pa2.g.set(50, 50, 50);
-  pa2.r = 25;
-
-  pa3.center.set(20, 10, -20);
-  pa3.g.set(-50,-50, -50);
-  pa3.r = 25;
-
-  pa4.center.set(-10, 10, -20);
-  pa4.g.set(-50, -50, -50);
-  pa4.r = 25;
 
   NSteps = 0;
   NTimeSteps = -1;
@@ -673,6 +656,11 @@ void handleKey(unsigned char key, int x, int y){
     case 'B':
       AllowBlend = !AllowBlend;
       Manager.EnableBlend(AllowBlend);
+      break;
+
+    case 't':
+    case 'T':
+      Toggle = !Toggle;
       break;
 
     case 'r':

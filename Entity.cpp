@@ -56,7 +56,7 @@ int Entity::CheckCollision(Vector3d pcen, Vector3d pvel, Vector3d pnewcen) {
   rtni = -1;
   fhit = 100;
 
-  for (i = 0; i < ntriangles; i++) {
+  for (i = 0; i < ntriangles/2; i++) {
     p0.set(vertices[triangles[i][0]]);
     p1.set(vertices[triangles[i][1]]);
     p2.set(vertices[triangles[i][2]]);

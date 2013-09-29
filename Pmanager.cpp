@@ -121,7 +121,7 @@ int Pmanager::KillParticles(double ts) {
         if (Particles[i].IsInUse()) {
             center = Particles[i].A.GetCenter();
 
-            if(Particles[i].GetAge(ts) > 15
+            if(Particles[i].GetAge(ts) > 10
                 || center.x > 80 || center.x < -80
                 || center.y > 80 || center.y < -80
                 || center.z > 80 || center.z < -80)
