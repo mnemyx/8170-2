@@ -1,4 +1,4 @@
-0.05	.1      10      10000
+0.05	.1      10      10000   20
 
 10     10
 20      10
@@ -16,7 +16,7 @@
 
 parameters format
 ===========================================
-timestep    displaytime     #particlestogenerate     #maxparticles
+timestep    displaytime     #particlestogenerate     #maxparticles      #particlehistory
 
 basespeed       speed_stddeviation
 basemass        mass_stddeviation

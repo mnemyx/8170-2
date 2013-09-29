@@ -26,7 +26,7 @@ class Particle {
 
 		double Birth;					// store NTimeSteps of when the particle is "born" (for age)
 
-		Vector3d history[MAXHIST];		// particle's history of centers
+		Vector3d *history;		// particle's history of centers
 		int nhistory;					// history indx
 		int maxhistory;                 // max history
 
@@ -36,8 +36,8 @@ class Particle {
         Attributes A;                   // attributes class
 
 		Particle();						// defaults...
-		//~Particle();
-        //void SetMaxHistory(int blendsize);
+		~Particle();
+        void SetMaxHistory(int blendsize);
 
 		void Reset();					// gets called by the constructor. kind of cleans up..
 		void Draw();					// draws the particle

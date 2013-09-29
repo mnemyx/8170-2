@@ -15,26 +15,28 @@ void Particle::Reset() {
 	InUse = false;
 	nhistory = 0;
 
-	/**if (history != NULL) {
+	if (history != NULL) {
+        history = NULL;
         delete[] history;
         history = NULL;
     }
 
-    history = new Vector3d[maxhistory];**/
+    history = new Vector3d[maxhistory];
 }
 
 
 Particle::Particle(){
     InUse = false;
 	nhistory = 0;
-	maxhistory = MAXHIST;
+	maxhistory = 0;
 
-    //history = NULL;
+    history = NULL;
 }
 
-/**
+
 Particle::~Particle() {
     if (history != NULL) {
+         history = NULL;
         delete[] history;
         history = NULL;
     }
@@ -43,7 +45,7 @@ Particle::~Particle() {
 void Particle::SetMaxHistory(int bs) {
     maxhistory = bs;
     history = new Vector3d[maxhistory];
-}**/
+}
 
 
 void Particle::Draw() {
@@ -53,13 +55,14 @@ void Particle::Draw() {
     glEnable(GL_BLEND);
 
     if(!Blend) {
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_POINT_SMOOTH);
         glBegin(GL_POINTS);
             glPointSize(0.3);
             glColor4f(A.GetColor().x, A.GetColor().y, A.GetColor().z, 1);
             glVertex3f(A.GetCenter().x, A.GetCenter().y, A.GetCenter().z);
         glEnd();
     } else {
+    glEnable(GL_LINE_SMOOTH);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         if(nhistory == 1) {
             glBegin(GL_LINE);

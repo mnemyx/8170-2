@@ -26,7 +26,7 @@ class Pmanager {
 
         Pmanager();
 		~Pmanager();
-		void SetMaxPart(int numofp);
+		void SetMaxPart(int numofp, int bs);
 
 		void SetStopped(int type);
 		void SetStarted(int type);

@@ -21,20 +21,21 @@ Pmanager::Pmanager() {
 
 Pmanager::~Pmanager() {
     if (Particles != NULL) {
+        Particles = NULL;
         delete[] Particles;
         Particles = NULL;
     }
 }
 
-void Pmanager::SetMaxPart(int numofp) {
+void Pmanager::SetMaxPart(int numofp, int bs) {
     nmaxparticles = numofp;
     Particles = new Particle[nmaxparticles];
-    /**
+
     int i;
     for (i = 0; i < nmaxparticles; i++ ) {
         Particles[i].SetMaxHistory(bs);
-        Particles[i].PrintInfo();
-    }**/
+       // Particles[i].PrintInfo();
+    }
 }
 
 void Pmanager::SetStopped(int type) { Stopped = type; }

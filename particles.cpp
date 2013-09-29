@@ -253,7 +253,7 @@ void Simulate(){
             Manager.Particles[j].A.SetCenter(Manager.Particles[j].A.GetTempc());
 
         }**/
-
+/**
         phit = -1;
         phit = Pl.CheckCollision(Manager.Particles[j].A.GetCenter(), Manager.Particles[j].A.GetTempv(), Manager.Particles[j].A.GetTempc());
 
@@ -262,10 +262,10 @@ void Simulate(){
           Manager.Particles[j].A.Reflect(Pl.GetNormal(phit), Pl.GetVertex(Pl.GetTriangle(phit).x));
 
           //DrawScene(1, ihit);  // should do something with this in terms of collision; change draw scene function
-        } else {
+        } else {**/
             Manager.Particles[j].A.SetVelocity(Manager.Particles[j].A.GetTempv());
             Manager.Particles[j].A.SetCenter(Manager.Particles[j].A.GetTempc());
-        }
+        //}
 
 
         //cout << "Im adding inside the simulate for loop... " << endl;
@@ -332,8 +332,8 @@ void LoadParameters(char *filename){
 
     ParamFilename = filename;
 
-    if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
-    &TimeStep, &DispTime, &numofparticles, &psize,
+    if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+    &TimeStep, &DispTime, &numofparticles, &psize, &blendsize,
     &bspeed, &speedstd,
     &bmass, &bstd,
     &(bcolor.x), &(bcolor.y), &(bcolor.z), &(bcolor.w), &colstd,
@@ -342,13 +342,13 @@ void LoadParameters(char *filename){
     &(bvelocity.x), &(bvelocity.y), &(bvelocity.z),
     &(env.Wind.x), &(env.Wind.y), &(env.Wind.z),
     &(env.G.x), &(env.G.y), &(env.G.z),
-    &env.Viscosity) != 29){
+    &env.Viscosity) != 30){
         fprintf(stderr, "error reading parameter file %s\n", filename);
         fclose(paramfile);
         exit(1);
     }
 
-    Manager.SetMaxPart((int)psize);
+    Manager.SetMaxPart((int)psize, (int)blendsize);
 
     Generator1.SetBaseAttr(2, bspeed, speedstd, bmass, bstd, bcolor, colstd, numofparticles, coefff, coeffr);
     Generator1.SetCenterRadius(bcenter, genr);
@@ -397,7 +397,7 @@ void InitSimulation(int argc, char* argv[]){
 
   Pl.BuildPlane(Vector3d(-20, -10, 15), Vector3d(20, -10, 15), Vector3d(20, 10, -20), Vector3d(-10, 10, -20));
 
-  pa1.center.set(5, -20, 15);
+  pa1.center.set(-20, -10, 15);
   pa1.g.set(5,5,5);
   pa1.r = 25;
 
@@ -409,9 +409,9 @@ void InitSimulation(int argc, char* argv[]){
   pa3.g.set(-50,-50, -50);
   pa3.r = 25;
 
-  pa3.center.set(-10, 10, -20);
-  pa3.g.set(-50, -50, -50);
-  pa3.r = 25;
+  pa4.center.set(-10, 10, -20);
+  pa4.g.set(-50, -50, -50);
+  pa4.r = 25;
 
   NSteps = 0;
   NTimeSteps = -1;
