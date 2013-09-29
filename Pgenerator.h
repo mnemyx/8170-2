@@ -77,6 +77,9 @@ class Pgenerator {
 		double GetCoefff();
 		double GetCoeffr();
 
+		// printing
+		void PrintGen();
+
 };
 
 #endif

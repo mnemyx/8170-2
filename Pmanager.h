@@ -12,19 +12,21 @@
 
 #include "Particle.h"
 
-#define MAXPART		10000
-
 class Pmanager {
 	private:
 		int nused;						// count of used particles
 		int Stopped;					// simulation is paused.
 		int Started;					// simulation is started...
 		int Step;						// simulation is step mode
+		int nmaxparticles;
+
 
 	public:
-        Particle Particles[MAXPART];	// matrix of particles...
+        Particle *Particles;	// matrix of particles...
 
-		Pmanager();
+        Pmanager();
+		~Pmanager();
+		void SetMaxPart(int numofp);
 
 		void SetStopped(int type);
 		void SetStarted(int type);
@@ -46,8 +48,7 @@ class Pmanager {
         int KillParticles(double timestep);
 
 		// assigns particle an initial velocity and center...
-		void UseParticle(Vector3d c0, Vector3d v0, double ts, Vector4d color, double m, double coefff, double coeffr, int blend);
-
+		void UseParticle(Vector3d c0, Vector3d v0, double ts, Vector4d color, double m, double coefff, double coeffr, int blend, int bs);
 
 
 		// draws all the used particles

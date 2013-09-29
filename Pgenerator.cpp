@@ -114,6 +114,10 @@ void Pgenerator::GenerateAttr() {
 			}
 
 			// calculate new point by turning it back to cartesian coordinates
+            //cout << "triIndx: " << triIndx;
+			//cout << " Shape.GetNormal(triIndx): ";
+			//( Shape.GetNormal(triIndx)).print();
+			//cout << endl ;
 			GeneratedC0 = p2 + u * (p0 - p2) + v * (p1 - p2) + (smallr * Shape.GetNormal(triIndx));
 			GeneratedV0 = gauss(Mean, StdDev, 0) * Shape.GetNormal(triIndx) + smallv;
 
@@ -124,6 +128,8 @@ void Pgenerator::GenerateAttr() {
 	GeneratedMass = gauss(BaseMass, MStdDev, 0);
 	//GeneratedColor.set(1,1,1,1);
 	GeneratedColor.set(gauss(BaseColor.x, CStdDev, 0), gauss(BaseColor.y, CStdDev, 0), gauss(BaseColor.z, CStdDev, 0), 1);
+
+	//PrintGen();
 }
 
 Vector4d Pgenerator::GenerateColor(Vector4d c) {
@@ -162,3 +168,14 @@ double Pgenerator::GenMass() { return GeneratedMass; }
 int Pgenerator::GetPNum() { return PNum; }
 double Pgenerator::GetCoefff() { return BaseCoefff; }
 double Pgenerator::GetCoeffr() { return BaseCoeffr; }
+
+// printing
+void Pgenerator::PrintGen() {
+    cout << "GENERATED VELOCITY: ";
+    GeneratedV0.print();
+    cout << endl << "GENERATED CENTER: ";
+    GeneratedC0.print();
+    cout << endl << "GENERATED COLOR: ";
+    GeneratedColor.print();
+    cout << endl << "GENERATED MASS: " << GeneratedMass << endl;
+}

@@ -56,10 +56,23 @@ int Model::AddTriangle(int v0, int v1, int v2){
   Vector3d V0(vertices[v0].x, vertices[v0].y, vertices[v0].z);
   Vector3d V1(vertices[v1].x, vertices[v1].y, vertices[v1].z);
   Vector3d V2(vertices[v2].x, vertices[v2].y, vertices[v2].z);
-
+   //V1.print(); V0.print(); V2.print(); V0.print();
   Vector3d V01 = V1 - V0;
   Vector3d V02 = V2 - V0;
-  normals[ntriangles] = (V01 % V02).normalize();
+  //V01.print();
+  //cout << " V01 --------- V02 ";
+  //V02.print();
+  //cout << endl;
+
+  Vector nullv(0,0,0);
+  if ((V01 % V02).norm() == 0)
+	  normals[ntriangles].set(nullv);
+  else
+	normals[ntriangles] = (V01 % V02).normalize();
+
+  //cout << "normal for triangle: " << ntriangles << " --- ";
+  //normals[ntriangles].print();
+  //cout << endl;
 
   return ntriangles++;
 }

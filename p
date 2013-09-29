@@ -1,4 +1,4 @@
-0.05	.01      5      10000
+0.05	.01      5      10000   10
 
 0     35
 20      10
@@ -7,7 +7,7 @@
 .4
 .2
 
-0       50       0      40
+0       50       0      5
 0       0       0
 
 0         0      0
@@ -16,7 +16,7 @@
 
 parameters format
 ===========================================
-timestep    displaytime     #particlestogenerate    #maxparticles
+timestep    displaytime     #particlestogenerat     #maxparticles   #maxhistoryforblend
 
 basespeed       speed_stddeviation
 basemass        mass_stddeviation

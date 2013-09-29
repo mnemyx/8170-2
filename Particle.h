@@ -18,7 +18,7 @@
 #  include <GL/glut.h>
 #endif
 
-#define MAXHIST		10
+#define MAXHIST		100
 
 class Particle {
 	private:
@@ -26,8 +26,9 @@ class Particle {
 
 		double Birth;					// store NTimeSteps of when the particle is "born" (for age)
 
-		Vector3d history[MAXHIST];		// particle's history of centers
+		Vector3d *history;		// particle's history of centers
 		int nhistory;					// history indx
+		int maxhistory;                 // max history
 
 		int Blend;                      // draw in blend mode toggle
 
@@ -35,6 +36,9 @@ class Particle {
         Attributes A;                   // attributes class
 
 		Particle();						// defaults...
+		~Particle();
+        void SetMaxHistory(int blendsize);
+
 		void Reset();					// gets called by the constructor. kind of cleans up..
 		void Draw();					// draws the particle
         void AddHistory(Vector3d c);	// adds history
@@ -49,6 +53,9 @@ class Particle {
 		double GetAge(double currentTimestep);
 		int IsInUse();
 		int Getnhistory();
+
+		////////// DEBUGGING //////////////
+		void PrintInfo();
 };
 
 #endif

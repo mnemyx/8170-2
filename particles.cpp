@@ -104,6 +104,9 @@ Pmanager Manager;
 Pgenerator Generator;
 Entity Sp;
 
+static int AllowBlend = true;
+static double BlendSize;
+
 struct Env {
     Vector3d G;
     Vector3d Wind;
@@ -154,13 +157,12 @@ void DrawMovingObj() {
 // Draw the non moving objects
 //
 void DrawNonMovingObj() {
-  //int i;
-  //glEnable(GL_DEPTH_TEST);
-  //glEnable(GL_BLEND);
-  //glDepthMask(GL_TRUE);
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
+  glDepthMask(GL_TRUE);
 
-  //GetShading(3);
-  Sp.Draw(1);
+  GetShading(0);
+  Sp.Draw(BRIGHT_PALEBLUE);
 }
 
 //
@@ -174,7 +176,7 @@ void DrawScene(int collision, int cubeIndx){
   glClear(GL_COLOR_BUFFER_BIT);
   glClear(GL_DEPTH_BUFFER_BIT);
 
-  DrawNonMovingObj();
+  //DrawNonMovingObj();
   DrawMovingObj();
 
   glutSwapBuffers();
@@ -198,13 +200,13 @@ void Simulate(){
     // for now, kill off particles whose age > 20
     int killed = Manager.KillParticles(Time);
 
-    cout << "killed: " << killed << endl;
+    //cout << "killed: " << killed << endl;
     Generator.MoveGenerator(TimeStep);
 
     // for every particle the manager has....
     for (j = 0; j < Manager.GetNused(); j++ ) {
          //Manager.Particles[j].A.PrintAttr();
-         cout << "j: " << j << endl;
+         //cout << "j: " << j << endl;
 
         // get the new acceleration
         Manager.Particles[j].A.CalcAccel(env.G, env.Wind, env.Viscosity);
@@ -238,16 +240,17 @@ void Simulate(){
 
         }
 
-        cout << "Im adding inside the simulate for loop... " << endl;
+        //cout << "Im adding inside the simulate for loop... " << endl;
         Manager.Particles[j].AddHistory(Manager.Particles[j].A.GetCenter());
+         //Manager.Particles[j].PrintInfo();
     }
 
-    cout << "ADDING!! " << endl;
+    //cout << "ADDING!! " << endl;
     // generate particles if we can
     if(freep = Manager.HasFreeParticles() > 0) {
         for(i = 0; i < freep || i < Generator.GetPNum(); i++) {
             Generator.GenerateAttr();
-            Manager.UseParticle(Generator.GenC0(), Generator.GenV0(), Time, Generator.GenC0(), Generator.GenMass(), Generator.GetCoefff(), Generator.GetCoeffr(), 1);
+            Manager.UseParticle(Generator.GenC0(), Generator.GenV0(), Time, Generator.GenC0(), Generator.GenMass(), Generator.GetCoefff(), Generator.GetCoeffr(), AllowBlend, (int)BlendSize);
         }
     }
 
@@ -298,8 +301,8 @@ void LoadParameters(char *filename){
 
     ParamFilename = filename;
 
-    if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
-    &TimeStep, &DispTime, &numofparticles, &psize,
+    if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+    &TimeStep, &DispTime, &numofparticles, &psize, &BlendSize,
     &bspeed, &speedstd,
     &bmass, &bstd,
     &(bcolor.x), &(bcolor.y), &(bcolor.z), &(bcolor.w), &colstd,
@@ -308,12 +311,13 @@ void LoadParameters(char *filename){
     &(bvelocity.x), &(bvelocity.y), &(bvelocity.z),
     &(env.Wind.x), &(env.Wind.y), &(env.Wind.z),
     &(env.G.x), &(env.G.y), &(env.G.z),
-    &env.Viscosity) != 29){
+    &env.Viscosity) != 30){
         fprintf(stderr, "error reading parameter file %s\n", filename);
         fclose(paramfile);
         exit(1);
     }
 
+    Manager.SetMaxPart((int)psize);
 
     Generator.SetBaseAttr(2, bspeed, speedstd, bmass, bstd, bcolor, colstd, numofparticles, coefff, coeffr);
     Generator.SetCenterRadius(bcenter, genr);
@@ -352,7 +356,7 @@ void InitSimulation(int argc, char* argv[]){
 
   LoadParameters(argv[1]);
 
-  Sp.BuildSphere(20,0,0,0);
+  Sp.BuildSphere(10,0,0,0);
 
   pa1.center.set(-40, 0, -5);
   pa1.g.set(200, 200, 200);

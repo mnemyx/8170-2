@@ -17,7 +17,22 @@ void Particle::Reset() {
 }
 
 Particle::Particle(){
-	Reset();
+    InUse = false;
+	nhistory = 0;
+
+    history = NULL;
+}
+
+Particle::~Particle() {
+    if (history != NULL) {
+        delete[] history;
+        history = NULL;
+    }
+}
+
+void Particle::SetMaxHistory(int bs) {
+    maxhistory = bs;
+    history = new Vector3d[maxhistory];
 }
 
 void Particle::Draw() {
@@ -28,6 +43,7 @@ void Particle::Draw() {
 
     if(!Blend) {
         glBegin(GL_POINTS);
+            glPointSize(0.3);
             glColor4f(A.GetColor().x, A.GetColor().y, A.GetColor().z, A.GetColor().w);
             glVertex3f(A.GetCenter().x, A.GetCenter().y, A.GetCenter().z);
         glEnd();
@@ -35,12 +51,14 @@ void Particle::Draw() {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         if(nhistory == 1) {
             glBegin(GL_LINE);
+                glLineWidth(1);
                 glColor4f(A.GetColor().x, A.GetColor().y, A.GetColor().z, 1);
                 glVertex3f(history[1].x, history[1].y, history[1].z);
                 glColor4f(A.GetColor().x, A.GetColor().y, A.GetColor().z, 0);
                 glVertex3f(history[0].x, history[0].y, history[0].z);
         } else {
             glBegin(GL_LINE_STRIP);
+            glLineWidth(1);
             for (i = nhistory - 1; i >= 0; i--) {
                 glColor4f(A.GetColor().x, A.GetColor().y, A.GetColor().z, (i/(nhistory-1)));
                 glVertex3f(history[i].x, history[i].y, history[i].z);
@@ -56,7 +74,7 @@ void Particle::Draw() {
 void Particle::AddHistory(Vector3d c) {
     int i;
     cout << "nhistory before --- " << nhistory << endl;
-	if(nhistory == MAXHIST){
+	if(nhistory == maxhistory){
 		for (i = 0; i < nhistory - 1; i++) {
             history[i] = history[i+1];
 		}
@@ -80,3 +98,22 @@ double Particle::GetAge(double currentTimestep) { return currentTimestep - Birth
 int Particle::IsInUse() { return InUse; }
 
 int Particle::Getnhistory() { return nhistory; }
+
+
+/////////// DEBUGGING ////////////////////
+void Particle::PrintInfo() {
+    cout << "In Use? " << InUse << endl;
+    cout << "Birth Time: " << Birth << endl;
+    cout << "nhistory: " << nhistory << endl;
+
+    int i;
+    for (i=0; i<nhistory; i++) {
+        cout << "nhistory #" << i << " vector: ";
+        history[i].print();
+        cout << endl;
+    }
+
+    cout << "Blend Mode? " << Blend << endl;
+
+    A.PrintAttr();
+}
